@@ -13,7 +13,7 @@ been measured so far.
 class Meter : public UnitIncrementListener {
   Meter();
   virtual void increment();
-  void setQuantityPerUnit(float amount); // eg. Litres per unit
+  void setQuantityPerIncrement(float amount); // eg. Litres per increment
   float getCurrentAmount();
 }
 
