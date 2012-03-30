@@ -12,7 +12,7 @@ namespace testing {
 	histogram.sample(value);
       }
     }
-  }
+  };
 
   TEST_F(HistogramTest, calculatesPercentilesCorrectlyOnAFlatDistribution) {
     Histogram histogram;
@@ -49,6 +49,8 @@ namespace testing {
     sampleValueNTimes(217, 2);
     sampleValueNTimes(223, 1);
 
-    EXPECT_NEAR(205, histogram.getPercentile(10), 1);
+    EXPECT_NEAR(205, histogram.getPercentile(15), 1);
     EXPECT_NEAR(216, histogram.getPercentile(90), 1);
-}
+  }
+
+} // namespace

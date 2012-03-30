@@ -11,10 +11,14 @@ for automatically calibrating the comparator settings.
 #include "SampleEventListener.h"
 
 class Histogram : public SampleEventListener {
+  unsigned int noOfSamples;
+  uint16_t histogram[POSSIBLE_SAMPLE_VALUES];
+
+ public:
   Histogram();
   virtual void sample(sample_t value);
   void clear();
   sample_t getPercentile(unsigned int percentile);
-}
+};
 
 #endif

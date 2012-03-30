@@ -14,21 +14,28 @@
 
 # Points to the root of Google Test, relative to where this file is.
 # Remember to tweak this if you move this file.
-GTEST_DIR = ../../unittest/gtest-1.6.0
+GMOCK_DIR = ../../unittest/gmock-1.6.0
+GTEST_DIR = $(GMOCK_DIR)/gtest
 
 # Where to find user code.
 USER_DIR = ..
+VPATH = $(USER_DIR) .
 
 # Test sources
-TEST_FILES = ComparatorTest.cpp HistogramTest.cpp MeterTest.cpp
+SRC_FILES = Comparator.cpp Histogram.cpp
+TEST_FILES = ComparatorTest.cpp HistogramTest.cpp
+#HistogramTest.cpp MeterTest.cpp
 
-OBJS = $(%.cpp:%o)
+OBJS = $(SRC_FILES:.cpp=.o) $(TEST_FILES:.cpp=.o)
 
 # Flags passed to the preprocessor.
-CPPFLAGS += -I$(GTEST_DIR)/include
+CPPFLAGS += -I$(GTEST_DIR)/include -I$(GMOCK_DIR)/include -I. -I..
 
 # Flags passed to the C++ compiler.
 CXXFLAGS += -g -Wall -Wextra -I$(USER_DIR)
+
+# Flags passed to the linker
+LDFLAGS = -lgtest -lgmock_main -L.
 
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
@@ -38,6 +45,9 @@ TESTS = unittests
 # definition.
 GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
                 $(GTEST_DIR)/include/gtest/internal/*.h
+GMOCK_HEADERS = $(GMOCK_DIR)/include/gmock/*.h \
+                $(GMOCK_DIR)/include/gmock/internal/*.h
+
 
 # House-keeping build targets.
 
@@ -51,6 +61,7 @@ clean :
 # Usually you shouldn't tweak such internal variables, indicated by a
 # trailing _.
 GTEST_SRCS_ = $(GTEST_DIR)/src/*.cc $(GTEST_DIR)/src/*.h $(GTEST_HEADERS)
+GMOCK_SRCS_ = $(GMOCK_DIR)/src/*.cc $(GMOCK_HEADERS)
 
 # For simplicity and to avoid depending on Google Test's
 # implementation details, the dependencies specified below are
@@ -60,14 +71,18 @@ gtest-all.o : $(GTEST_SRCS_)
 	$(CXX) $(CPPFLAGS) -I$(GTEST_DIR) $(CXXFLAGS) -c \
             $(GTEST_DIR)/src/gtest-all.cc
 
-gtest_main.o : $(GTEST_SRCS_)
-	$(CXX) $(CPPFLAGS) -I$(GTEST_DIR) $(CXXFLAGS) -c \
-            $(GTEST_DIR)/src/gtest_main.cc
+gmock-all.o : $(GMOCK_SRCS_)
+	$(CXX) $(CPPFLAGS) -I$(GMOCK_DIR) $(CXXFLAGS) -c \
+            $(GMOCK_DIR)/src/gmock-all.cc
 
-gtest.a : gtest-all.o
+gmock_main.o : $(GMOCK_SRCS_)
+	$(CXX) $(CPPFLAGS) -I$(GTEST_DIR) $(CXXFLAGS) -c \
+            $(GMOCK_DIR)/src/gmock_main.cc
+
+libgtest.a : gtest-all.o
 	$(AR) $(ARFLAGS) $@ $^
 
-gtest_main.a : gtest-all.o gtest_main.o
+libgmock_main.a : gmock-all.o gmock_main.o
 	$(AR) $(ARFLAGS) $@ $^
 
 # Builds a sample test.  A test should link with either gtest.a or
@@ -77,5 +92,5 @@ gtest_main.a : gtest-all.o gtest_main.o
 %.o : %.cpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $^ -o $@ 
 
-unittests : $(OBJS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+unittests : $(OBJS) libgtest.a libgmock_main.a
+	$(CXX) $(LDFLAGS) -lpthread $^ -o $@
