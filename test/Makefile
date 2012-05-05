@@ -22,9 +22,8 @@ USER_DIR = ..
 VPATH = $(USER_DIR) .
 
 # Test sources
-SRC_FILES = Comparator.cpp Histogram.cpp
-TEST_FILES = ComparatorTest.cpp HistogramTest.cpp
-#HistogramTest.cpp MeterTest.cpp
+SRC_FILES = Comparator.cpp Histogram.cpp Meter.cpp
+TEST_FILES = ComparatorTest.cpp HistogramTest.cpp MeterTest.cpp
 
 OBJS = $(SRC_FILES:.cpp=.o) $(TEST_FILES:.cpp=.o)
 
