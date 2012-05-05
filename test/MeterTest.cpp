@@ -9,7 +9,7 @@ namespace testing {
 
     void callIncrementNTimes(unsigned int times) {
       for(unsigned int i = 0; i < times ; i++) {
-	meter.increment();
+    	  meter.increment();
       }
     }
   }

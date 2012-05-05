@@ -9,14 +9,12 @@ namespace testing {
 
     void sampleValueNTimes(sample_t value, unsigned int times) {
       for(unsigned int i = 0; i < times ; i++) {
-	histogram.sample(value);
+    	  histogram.sample(value);
       }
     }
   };
 
   TEST_F(HistogramTest, calculatesPercentilesCorrectlyOnAFlatDistribution) {
-    Histogram histogram;
-
     for(sample_t i=MIN_SAMPLE_VALUE; i <=MAX_SAMPLE_VALUE ; i++) {
       histogram.sample(i);
     }
@@ -27,7 +25,6 @@ namespace testing {
   }
 
   TEST_F(HistogramTest, isUsefulForCalibration) {
-    Histogram histogram;
     
     /* sample the following histogram shape
 
