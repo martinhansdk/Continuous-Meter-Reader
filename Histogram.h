@@ -11,8 +11,17 @@ for automatically calibrating the comparator settings.
 #include "SampleEventListener.h"
 
 class Histogram : public SampleEventListener {
+  static const int SCALE = 4;
   unsigned int noOfSamples;
-  uint16_t histogram[POSSIBLE_SAMPLE_VALUES];
+  uint16_t histogram[POSSIBLE_SAMPLE_VALUES/SCALE];
+
+  unsigned int sampleValueToIndex(sample_t sampleValue) { 
+    return sampleValue/SCALE; 
+  }
+
+  sample_t indexToSampleValue(unsigned int index) { 
+    return index*SCALE; 
+  }
 
  public:
   Histogram();

@@ -20,8 +20,8 @@ namespace testing {
     }
 
     EXPECT_EQ(MIN_SAMPLE_VALUE, histogram.getPercentile(0));
-    EXPECT_EQ(MAX_SAMPLE_VALUE, histogram.getPercentile(100));
-    EXPECT_EQ((MAX_SAMPLE_VALUE-MIN_SAMPLE_VALUE)/2, histogram.getPercentile(50));
+    EXPECT_NEAR(MAX_SAMPLE_VALUE, histogram.getPercentile(100), 3);
+    EXPECT_NEAR((MAX_SAMPLE_VALUE-MIN_SAMPLE_VALUE)/2, histogram.getPercentile(50), 3);
   }
 
   TEST_F(HistogramTest, isUsefulForCalibration) {
