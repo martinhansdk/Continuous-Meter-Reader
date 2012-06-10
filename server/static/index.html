@@ -1,0 +1,41 @@
+<html>
+<head>
+<title>Water meter</title>
+<meta name="viewport" content="width=device-width"/>  
+<link href="/meter.css" rel="stylesheet"></link>
+<script src="http://code.jquery.com/jquery-1.6.1.min.js"></script>
+<script src="http://192.168.1.40:8000/socket.io/socket.io.js"></script>
+<script>
+  var offset = 0;
+  var value = 0;
+
+  function toFixed(value, precision) {
+    var power = Math.pow(10, precision || 0);
+    return String(Math.round(value * power) / power);
+  }
+
+  function updateCounterDisplay(newValue) {
+    value = newValue;
+    var displayValue = newValue - offset;
+    $('#counter').text(toFixed(displayValue, 3));
+  }
+
+  var socket = io.connect('http://192.168.1.40:8000');
+  socket.on('counter', updateCounterDisplay);
+
+  $(document).ready(function() {
+    $('#reset').click( function() {
+      offset = value;
+      updateCounterDisplay(value);
+    });
+  });
+</script>
+</head>
+<body>
+<div id="meter">
+Current value:
+<div class="counterbox"><span id="counter"></span> L</div>
+<button type="button" id="reset">Reset</button>
+</div>
+</body>
+</html>
