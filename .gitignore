@@ -1,4 +1,4 @@
 *~
-build/*
-\#*#
- 
+*.o
+test/unittests
+*.a
