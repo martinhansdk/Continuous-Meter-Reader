@@ -15,21 +15,16 @@ namespace testing {
   };
 
   TEST_F(MeterTest, countsCorrectly) {
-    const float LITRES_PER_INCREMENT = 1.0/100.0; // 100 increments per Litre
-    const float ACCURACY=0.001;
-
-    meter.setQuantityPerIncrement(LITRES_PER_INCREMENT);
-
-    EXPECT_NEAR(0.0, meter.getCurrentAmount(), ACCURACY);
+    EXPECT_EQ(0u, meter.getCurrentValue());
 
     callIncrementNTimes(20);
-    EXPECT_NEAR(0.2, meter.getCurrentAmount(), ACCURACY);
+    EXPECT_EQ(20u, meter.getCurrentValue());
 
     callIncrementNTimes(55);
-    EXPECT_NEAR(0.75, meter.getCurrentAmount(), ACCURACY);
+    EXPECT_EQ(75u, meter.getCurrentValue());
 
     callIncrementNTimes(100);
-    EXPECT_NEAR(1.75, meter.getCurrentAmount(), ACCURACY);
+    EXPECT_EQ(175u, meter.getCurrentValue());
   }
 
 }

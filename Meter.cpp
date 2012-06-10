@@ -7,18 +7,14 @@
 
 #include "Meter.h"
 
-Meter::Meter() : count(0), quantityPerIncrement(1.0) {
+Meter::Meter() : count(0) {
 
 }
 
 void Meter::increment() {
-	count++;
+  count++;
 }
 
-void Meter::setQuantityPerIncrement(float amount){
-	quantityPerIncrement = amount;
-}
-
-float Meter::getCurrentAmount() {
-	return count*quantityPerIncrement;
+uint32_t Meter::getCurrentValue() {
+  return count;
 }

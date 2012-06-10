@@ -12,13 +12,11 @@ been measured so far.
 #include "UnitIncrementListener.h"
 
 class Meter : public UnitIncrementListener {
-	uint32_t count;
-	float quantityPerIncrement;
+  uint32_t count;
 public:
   Meter();
   virtual void increment();
-  void setQuantityPerIncrement(float amount); // eg. Litres per increment
-  float getCurrentAmount();
+  uint32_t getCurrentValue();
 };
 
 #endif
