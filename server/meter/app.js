@@ -41,7 +41,7 @@ app.listen(3000, function(){
 // talk to arduino
 
 var SerialPort  = require('serialport').SerialPort;
-var portName = '/dev/ttyUSB1';
+var portName = '/dev/ttyUSB0';
 
 var sp = new SerialPort(portName); // instantiate the serial port.
 var counterValue = 'waiting'; // this stores the clean data
