@@ -1,0 +1,78 @@
+<!doctype>
+<head>
+    <link type="text/css" rel="stylesheet" href="rickshaw/src/css/graph.css">
+    <link type="text/css" rel="stylesheet" href="rickshaw/examples/css/lines.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/react.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/JSXTransformer.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+    <script src="rickshaw/vendor/d3.v3.js"></script>
+
+
+    <script src="rickshaw/rickshaw.js"></script>
+    <script src="rickshaw/src/js/Rickshaw.Graph.Legend.js"></script>
+    <script src="rickshaw/src/js/Rickshaw.Color.Palette.js"></script>
+</head>
+<body>
+
+    <div id="example"></div>
+    <script type="text/jsx">
+      React.render(
+        <h1>Hello, world!</h1>,
+        document.getElementById('example')
+      );
+    </script>
+
+<div id="chart_container">
+    <div id="chart"></div>
+</div>
+
+<script>
+
+var palette = new Rickshaw.Color.Palette( { scheme: 'classic9' } );
+
+var graph = new Rickshaw.Graph.Ajax( {
+
+    element: document.getElementById("chart"),
+    width: 400,
+    height: 200,
+    renderer: 'line',
+    //dataURL: '/api/allvalues',
+    dataURL: '/api/dummyvalues',
+    //onData: function(d) { d[0].data[0].y = 80; return d },
+    /*
+    series: [
+        {
+            color: palette.color(),
+            name: 'Water'
+        }
+    ] */
+} );
+
+//graph.render();
+/*
+var slider = new Rickshaw.Graph.RangeSlider({
+    graph: graph,
+    element: document.querySelector('#slider')
+});
+
+var legend = new Rickshaw.Graph.Legend( {
+    graph: graph,
+    element: document.getElementById('legend')
+
+} );
+
+var xAxis = new Rickshaw.Graph.Axis.Time( {
+    graph: graph,
+    ticksTreatment: ticksTreatment,
+    timeFixture: new Rickshaw.Fixtures.Time.Local()
+} );
+
+xAxis.render();
+*/
+
+
+</script
+>
+</body>
