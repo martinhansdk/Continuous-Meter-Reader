@@ -13,6 +13,7 @@ func MakeAPI() *rest.Api {
 
 	router, err := rest.MakeRouter(
 		rest.Get("/message", func(w rest.ResponseWriter, req *rest.Request) { w.WriteJson(map[string]string{"Body": "Hello World!"}) }),
+		rest.Get("/currentabsolutevalues", mdb.GetCurrentAbsoluteValues),
 		rest.Get("/cumulativevalues/#meter", mdb.GetCumulativeValues),
 		rest.Get("/differentialvalues/#meter", mdb.GetDifferentialValues),
 	)

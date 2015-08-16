@@ -16,11 +16,45 @@
 </head>
 <body>
 
-    <div id="example"></div>
+    <div id="meters"></div>
     <script type="text/jsx">
+
+    var data = [
+        {meter: "water", value:265, unit:"L"},
+        {meter: "electricity", value:12.5, unit:"kWh"},
+    ];
+
+    var Meter = React.createClass({
+        render: function() {
+            return (
+                <div>{this.props.name}: {this.props.value} {this.props.unit}</div>
+            );
+        }
+    });
+    
+
+    var Meters = React.createClass({
+        render: function() {
+            var meters = this.props.data.map(function (meter) {
+                return (
+                    <Meter name={meter.meter} value={meter.value} unit={meter.unit}/>
+                );
+            });
+
+        return (    
+            <div>
+                <h1>Meters</h1>
+                {meters}
+            </div>
+            );
+        }
+    });
+
+    $.getJSON( "api/test.json", function( data ) {
+
       React.render(
-        <h1>Hello, world!</h1>,
-        document.getElementById('example')
+        <Meters data={data} />,
+        document.getElementById('meters')
       );
     </script>
 
