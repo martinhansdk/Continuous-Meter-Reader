@@ -1,4 +1,10 @@
 *~
 *.o
-test/unittests
 *.a
+*.pyc
+\#*# 
+build/*
+test/unittests
+go/pkg
+go/bin
+go/src/github.com
