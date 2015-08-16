@@ -9,11 +9,21 @@ import (
 )
 
 /*
+CREATE TABLE meters
+	("id" integer CONSTRAINT pkey PRIMARY KEY,
+	 "name" varchar(40) NOt NULL,
+	 "unit" varchar(20) NOT NULL,
+	 "current_series" integer NOT NULL,
+	 "last_count" integer NOT NULL
+	 );
+
 CREATE TABLE measurements
 	("measured_at" timestamp with time zone,
-	 "meter" int,
-	 "value" int)
-;
+	 "meter" integer references meters(id),
+	 "value" integer
+	 );
+
+
 */
 
 type MeterDB struct {
@@ -23,13 +33,55 @@ type MeterDB struct {
 func NewMeterDB() *MeterDB {
 	mdb := new(MeterDB)
 
-	db, err := sql.Open("postgres", "user=martin dbname=meters password=meter2")
+	db, err := sql.Open("postgres", "user=meter dbname=meter password=meter2")
 	if err != nil {
 		log.Fatal(err)
 	}
 	mdb.db = db
 
 	return mdb
+}
+
+func (mdb *MeterDB) GetMeterState() map[int32]*Meter {
+	meters := make(map[int32]*Meter)
+
+	var (
+		id             int
+		name           string
+		unit           string
+		current_series int
+		last_count     int
+		last_value     int
+	)
+
+	rows, err := mdb.db.Query(`
+			SELECT DISTINCT ON(meter)
+			    id, 
+				name, 
+				unit, 
+				current_series, 
+				last_count, 
+				value AS last_value 
+			FROM meters, measurements 
+			WHERE meters.id = measurements.meter
+			ORDER BY meter, measured_at DESC;`)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		err := rows.Scan(&id, &name, &unit, &current_series, &last_count, &last_value)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Println(id, name, unit, current_series, last_count, last_value)
+	}
+	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return meters
 }
 
 func (mdb *MeterDB) InsertMeasurement() {
@@ -45,6 +97,17 @@ func (mdb *MeterDB) GetJSONFromDB(w rest.ResponseWriter, query string, args ...i
 	}
 
 	w.(http.ResponseWriter).Write([]byte(json))
+}
+
+func (mdb *MeterDB) GetCurrentAbsoluteValues(w rest.ResponseWriter, req *rest.Request) {
+	mdb.GetJSONFromDB(w, `
+		SELECT 
+			meter,
+			name
+			unit,
+			LAST_VALUE(value) OVER (PARTITION BY meters.id ORDER BY measured_at DESC) AS value 
+		FROM measurements, meters
+		WHERE meters.id = measurements.meter`)
 }
 
 func (mdb *MeterDB) GetCumulativeValues(w rest.ResponseWriter, req *rest.Request) {

@@ -97,14 +97,13 @@ func HandleProtoClient(conn net.Conn, c chan *CounterUpdate) {
 
 type Meter struct {
 	MeterId       int32
+	Unit          string
 	CurrentSeries uint32
 	StartCount    uint64
 	LastCount     uint64
 }
 
-var meters = make(map[int32]*Meter)
-
-func WriteValuesToDatabase(msg *CounterUpdate) {
+func WriteValuesToDatabase(mdb *MeterDB, meters map[int32]*Meter, msg *CounterUpdate) {
 
 	//Retreive client information from the protobuf message
 	MeterId := msg.GetMeterId()

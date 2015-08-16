@@ -25,13 +25,15 @@ func main() {
 	// receive new updates from the meters
 	c := make(chan *MeterReader.CounterUpdate)
 	go func() {
+		mdb := MeterReader.NewMeterDB()
+		meters := mdb.GetMeterState()
 		for {
 			message := <-c
-			MeterReader.WriteValuesToDatabase(message)
-
+			MeterReader.WriteValuesToDatabase(mdb, meters, message)
 		}
 	}()
-	//Listen to the TCP port
+
+	//Listen to the TCP port for connections from meter readers
 	listener, err := net.Listen("tcp", "127.0.0.1:2110")
 	MeterReader.CheckError(err)
 	for {
