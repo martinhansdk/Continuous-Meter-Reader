@@ -7,22 +7,20 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/JSXTransformer.js"></script>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+    <!--
     <script src="rickshaw/vendor/d3.v3.js"></script>
 
 
     <script src="rickshaw/rickshaw.js"></script>
     <script src="rickshaw/src/js/Rickshaw.Graph.Legend.js"></script>
     <script src="rickshaw/src/js/Rickshaw.Color.Palette.js"></script>
+-->
+    <script src="https://cdn.socket.io/socket.io-1.3.5.js"></script>
 </head>
 <body>
 
     <div id="meters"></div>
     <script type="text/jsx">
-
-    var data = [
-        {meter: "water", value:265, unit:"L"},
-        {meter: "electricity", value:12.5, unit:"kWh"},
-    ];
 
     var Meter = React.createClass({
         render: function() {
@@ -34,28 +32,51 @@
     
 
     var Meters = React.createClass({
+        componentDidMount: function() {
+            var that = this;
+            this.socket = io();
+            this.socket.on('meter update', function (data) {
+                that.addMeterUpdate(data);
+            });
+        },
+
+        addMeterUpdate: function(update) {
+            var data = this.props.data;
+            var len = data.length;
+
+            for (var i = 0; i < len; i++) {
+                if(data[i].meter == update.meter) {
+                    data[i] = update;
+                }
+            }
+            this.setState(data);
+        },
+
         render: function() {
+            
             var meters = this.props.data.map(function (meter) {
                 return (
-                    <Meter name={meter.meter} value={meter.value} unit={meter.unit}/>
+                    <Meter name={meter.name} value={meter.value} unit={meter.unit} />
                 );
             });
 
-        return (    
-            <div>
-                <h1>Meters</h1>
-                {meters}
-            </div>
+            return (    
+                <div>
+                    <h1>Meters</h1>
+                    {meters}
+                </div>
             );
         }
     });
 
-    $.getJSON( "api/test.json", function( data ) {
+    $.getJSON( "/api/currentabsolutevalues", function( data ) {
 
-      React.render(
+    var ui = React.render(
         <Meters data={data} />,
         document.getElementById('meters')
       );
+    });
+
     </script>
 
 <div id="chart_container">
@@ -64,6 +85,7 @@
 
 <script>
 
+/*
 var palette = new Rickshaw.Color.Palette( { scheme: 'classic9' } );
 
 var graph = new Rickshaw.Graph.Ajax( {
@@ -73,17 +95,10 @@ var graph = new Rickshaw.Graph.Ajax( {
     height: 200,
     renderer: 'line',
     //dataURL: '/api/allvalues',
-    dataURL: '/api/dummyvalues',
+    //dataURL: '/api/currentabsolutevalues',
     //onData: function(d) { d[0].data[0].y = 80; return d },
-    /*
-    series: [
-        {
-            color: palette.color(),
-            name: 'Water'
-        }
-    ] */
 } );
-
+*/
 //graph.render();
 /*
 var slider = new Rickshaw.Graph.RangeSlider({
@@ -107,6 +122,5 @@ xAxis.render();
 */
 
 
-</script
->
+</script>
 </body>

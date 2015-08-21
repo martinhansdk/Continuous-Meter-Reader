@@ -38,7 +38,7 @@ count=0
 while True:
     inc = CounterUpdate_pb2.CounterUpdate()
 
-    inc.meterId = 0
+    inc.meterId = 1
     if random.randint(0,10) == 1:
         # new series
         series += 1

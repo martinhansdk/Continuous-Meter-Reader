@@ -46,12 +46,12 @@ func (mdb *MeterDB) GetMeterState() map[int32]*Meter {
 	meters := make(map[int32]*Meter)
 
 	var (
-		id             int
+		id             int32
 		name           string
 		unit           string
-		current_series int
-		last_count     int
-		last_value     int
+		current_series uint32
+		last_count     uint64
+		last_value     uint64
 	)
 
 	rows, err := mdb.db.Query(`
@@ -75,12 +75,15 @@ func (mdb *MeterDB) GetMeterState() map[int32]*Meter {
 			log.Fatal(err)
 		}
 		log.Println(id, name, unit, current_series, last_count, last_value)
+		meter := &Meter{MeterId: id, Name: name, Unit: unit, CurrentSeries: current_series, StartCount: last_count, LastCount: last_value}
+		meters[id] = meter
 	}
 	err = rows.Err()
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	log.Println(meters)
 	return meters
 }
 
@@ -90,7 +93,7 @@ func (mdb *MeterDB) InsertMeasurement() {
 
 func (mdb *MeterDB) GetJSONFromDB(w rest.ResponseWriter, query string, args ...interface{}) {
 	var json string
-	err := mdb.db.QueryRow("SELECT json_agg(t) FROM ("+query+") ) as t;", args...).Scan(&json)
+	err := mdb.db.QueryRow("SELECT json_agg(t) FROM ("+query+") as t;", args...).Scan(&json)
 
 	if err != nil {
 		rest.Error(w, err.Error(), http.StatusInternalServerError)
@@ -101,13 +104,15 @@ func (mdb *MeterDB) GetJSONFromDB(w rest.ResponseWriter, query string, args ...i
 
 func (mdb *MeterDB) GetCurrentAbsoluteValues(w rest.ResponseWriter, req *rest.Request) {
 	mdb.GetJSONFromDB(w, `
-		SELECT 
-			meter,
-			name
-			unit,
-			LAST_VALUE(value) OVER (PARTITION BY meters.id ORDER BY measured_at DESC) AS value 
-		FROM measurements, meters
-		WHERE meters.id = measurements.meter`)
+		SELECT DISTINCT ON(meter)
+				meter,
+				name, 
+				unit, 
+				value
+			FROM meters, measurements 
+			WHERE meters.id = measurements.meter
+			ORDER BY meter, measured_at DESC
+		`)
 }
 
 func (mdb *MeterDB) GetCumulativeValues(w rest.ResponseWriter, req *rest.Request) {

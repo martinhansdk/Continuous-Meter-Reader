@@ -95,39 +95,6 @@ func HandleProtoClient(conn net.Conn, c chan *CounterUpdate) {
 	}
 }
 
-type Meter struct {
-	MeterId       int32
-	Unit          string
-	CurrentSeries uint32
-	StartCount    uint64
-	LastCount     uint64
-}
-
-func WriteValuesToDatabase(mdb *MeterDB, meters map[int32]*Meter, msg *CounterUpdate) {
-
-	//Retreive client information from the protobuf message
-	MeterId := msg.GetMeterId()
-
-	meter, ok := meters[MeterId]
-	if !ok {
-		meter = &Meter{MeterId: MeterId}
-		meters[MeterId] = meter
-	}
-
-	SeriesId := msg.GetSeriesId()
-	CurrentCounterValue := msg.GetCurrentCounterValue()
-
-	if meter.CurrentSeries != SeriesId {
-		meter.CurrentSeries = SeriesId
-		meter.StartCount = meter.LastCount
-	}
-	meter.LastCount = meter.StartCount + CurrentCounterValue
-
-	fmt.Printf("meterid=%d series=%d counter=%d -> absolute=%d\n", MeterId, SeriesId, CurrentCounterValue, meter.LastCount)
-
-	//mdb.InsertMeasurement(MeterId, meter.LastCount)
-}
-
 func CheckError(err error) {
 	if err != nil {
 		fmt.Printf("Fatal error: %s", err.Error())
