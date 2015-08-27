@@ -4,6 +4,16 @@
 #include "Histogram.h"
 #include "Meter.h"
 #include "Comparator.h"
+#include "CounterUpdate_pb.h"
+#include "pb_encode.h"
+#include "crc32.h"
+
+
+#define htonl(x) ( ((x)<<24 & 0xFF000000UL) | \
+                   ((x)<< 8 & 0x00FF0000UL) | \
+                   ((x)>> 8 & 0x0000FF00UL) | \
+                   ((x)>>24 & 0x000000FFUL) )
+
 
 Comparator comparator;
 Meter meter;
@@ -20,6 +30,9 @@ int calibrationSamples=SAMPLES_TO_CALIBRATE;
 int calibrationMode;
 int sendValueFlag;
 unsigned int ticks; // must be big enough to hold TICKS_BETWEEN_SEND
+
+int32_t meterId = 1;
+int32_t seriesId = 1;
 
 void setup() {
   sendValueFlag = 0;
@@ -76,7 +89,7 @@ ISR(TIMER1_COMPA_vect)          // timer compare interrupt service routine
 
 void loop() {
     if(sendValueFlag) {
-      unsigned long currentValue;
+      uint64_t currentValue;
       // protected access to variables shared with ISR BEGIN
       noInterrupts();
       sendValueFlag = 0;
@@ -84,9 +97,28 @@ void loop() {
       interrupts();
       // protected access to variables shared with ISR END
 
-      Serial.print("<");
-      Serial.print(currentValue);
-      Serial.print(">");
+      {
+        MeterReader_CounterUpdate mymessage = {meterId, seriesId, currentValue};
+        uint8_t buffer[MeterReader_CounterUpdate_size];
+        
+        pb_ostream_t stream = pb_ostream_from_buffer(buffer, sizeof(buffer));
+        pb_encode(&stream, MeterReader_CounterUpdate_fields, &mymessage);
+        Serial.write("AA");
+        serial_write_uint32(stream.bytes_written); 
+        Serial.write(buffer, stream.bytes_written);
+        uint32_t crc = crc_array(buffer, stream.bytes_written);
+        serial_write_uint32(crc);
+      }
     }
 }
 
+void serial_write_uint32(uint32_t val) {
+  uint8_t bytes[4];
+  val = htonl(val); // convert to network byte order
+  bytes[0] = (val >> 24) & 0xFF;
+  bytes[1] = (val >> 16) & 0xFF;
+  bytes[2] = (val >> 8) & 0xFF;
+  bytes[3] = val & 0xFF;
+  
+  Serial.write(bytes, 4);
+}

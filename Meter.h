@@ -12,11 +12,11 @@ been measured so far.
 #include "UnitIncrementListener.h"
 
 class Meter : public UnitIncrementListener {
-  uint32_t count;
+  uint64_t count;
 public:
   Meter();
   virtual void increment();
-  uint32_t getCurrentValue();
+  uint64_t getCurrentValue();
 };
 
 #endif

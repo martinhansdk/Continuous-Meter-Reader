@@ -15,6 +15,6 @@ void Meter::increment() {
   count++;
 }
 
-uint32_t Meter::getCurrentValue() {
+uint64_t Meter::getCurrentValue() {
   return count;
 }

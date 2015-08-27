@@ -13,9 +13,11 @@ MAGIC_STRING = 'AA'
 
 def send_message(sock, message):
     """ Send a serialized message (protobuf Message interface)
-        to a socket, prepended by a magic header, the length of
-        the message packed in 4 bytes (big endian), followed by 
-        the crc32 value of the protobuf message in 4 bytes (big endian).
+        to a socket in the following format:
+          * the magic header
+          * the length of the encoded protobuf message in 4 bytes (big endian)
+          * the encoded protobuf message
+          * the crc32 value of the protobuf message in 4 bytes (big endian)
     """
     s = message.SerializeToString()
     packed_len = struct.pack('>L', len(s))
