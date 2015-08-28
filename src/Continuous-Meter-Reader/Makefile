@@ -62,7 +62,7 @@ endif
 
 ### MONITOR_PORT
 ### The port your board is connected to. Using an '*' tries all the ports and finds the right one.
-MONITOR_PORT      = /dev/tty.usbmodem*
+MONITOR_PORT      = /dev/ttyUSB*
 
 ### don't touch this
 CURRENT_DIR       = $(shell basename $(CURDIR))

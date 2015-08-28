@@ -3,12 +3,14 @@ package main
 import (
 	"MeterReader"
 	"github.com/googollee/go-socket.io"
+	"github.com/tarm/serial"
 	"log"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 func main() {
@@ -27,6 +29,23 @@ func main() {
 			} else {
 				continue
 			}
+		}
+	}()
+
+	// Listen to the serial port
+	go func() {
+		config := &serial.Config{Name: "/dev/ttyUSB0", Baud: 115200}
+
+		for {
+			ser, err := serial.OpenPort(config)
+
+			if err != nil {
+				// ok, retry in a moment
+			} else {
+				MeterReader.HandleProtoClient(ser, c)
+			}
+
+			time.Sleep(time.Second) // try to open again in a second
 		}
 	}()
 

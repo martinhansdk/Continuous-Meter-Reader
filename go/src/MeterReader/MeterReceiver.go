@@ -2,22 +2,21 @@ package MeterReader
 
 import (
 	"encoding/binary"
-	"fmt"
 	"github.com/golang/protobuf/proto"
 	"hash/crc32"
 	"io"
-	"net"
+	"log"
 	"os"
 )
 
-const MAX_PROTOBUF_MSG_LEN = 16
+const MAX_PROTOBUF_MSG_LEN = 28
 
 var castagnoliTable = crc32.MakeTable(crc32.IEEE) // see http://golang.org/pkg/hash/crc32/#pkg-constants
 
-func HandleProtoClient(conn net.Conn, c chan *CounterUpdate) {
+func HandleProtoClient(conn io.ReadCloser, c chan *CounterUpdate) {
 	var len uint32
 
-	fmt.Println("Connection established")
+	log.Println("Connection established")
 	//Close the connection when the function exits
 	defer conn.Close()
 
@@ -30,6 +29,7 @@ func HandleProtoClient(conn net.Conn, c chan *CounterUpdate) {
 		for seen != 2 {
 			_, err := conn.Read(buf)
 			if err == io.EOF {
+				log.Printf("EOF reached")
 				break
 			}
 
@@ -44,20 +44,21 @@ func HandleProtoClient(conn net.Conn, c chan *CounterUpdate) {
 
 		}
 		if garbage > 0 {
-			fmt.Printf("Discarded %d bytes of garbage\n", garbage)
+			log.Printf("Discarded %d bytes of garbage\n", garbage)
 		}
 
 		//Read the length field
 		err := binary.Read(conn, binary.BigEndian, &len)
 		if err == io.EOF {
+			log.Printf("EOF reached")
 			break
 		}
 
 		CheckError(err)
-		fmt.Println("len=", len)
+		log.Println("len=", len)
 
 		if len > MAX_PROTOBUF_MSG_LEN {
-			fmt.Println("Message length unrealistically large. Skipping. len=", len)
+			log.Println("Message length unrealistically large. Skipping. len=", len)
 			continue
 		}
 
@@ -66,6 +67,7 @@ func HandleProtoClient(conn net.Conn, c chan *CounterUpdate) {
 		//Read the data waiting on the connection and put it in the data buffer
 		n, err := conn.Read(data)
 		if err == io.EOF {
+			log.Printf("EOF reached")
 			break
 		}
 		CheckError(err)
@@ -76,18 +78,18 @@ func HandleProtoClient(conn net.Conn, c chan *CounterUpdate) {
 		var expectedCRC uint32
 		err = binary.Read(conn, binary.BigEndian, &expectedCRC)
 		if err == io.EOF {
+			log.Printf("EOF reached")
 			break
 		}
 		CheckError(err)
 
 		if crc.Sum32() != expectedCRC {
-			fmt.Println("Checksum mismatch, skipping")
+			log.Println("Checksum mismatch, skipping")
 			continue
 		}
 
-		//Create an struct pointer of type ProtobufTest.TestMessage struct
 		protodata := new(CounterUpdate)
-		//Convert all the data retrieved into the ProtobufTest.TestMessage struct type
+		//Convert all the data retrieved into the CounterUpdate struct type
 		err = proto.Unmarshal(data[0:n], protodata)
 		CheckError(err)
 		//Push the protobuf message into a channel
@@ -97,7 +99,7 @@ func HandleProtoClient(conn net.Conn, c chan *CounterUpdate) {
 
 func CheckError(err error) {
 	if err != nil {
-		fmt.Printf("Fatal error: %s", err.Error())
+		log.Fatal("Fatal error: %s", err.Error())
 		os.Exit(1)
 	}
 }

@@ -8,11 +8,6 @@
 #include "pb_encode.h"
 #include "crc32.h"
 
-
-#define htonl(x) ( ((x)<<24 & 0xFF000000UL) | \
-                   ((x)<< 8 & 0x00FF0000UL) | \
-                   ((x)>> 8 & 0x0000FF00UL) | \
-                   ((x)>>24 & 0x000000FFUL) )
 void serial_write_uint32(uint32_t val);
 
 Comparator comparator;
@@ -33,13 +28,14 @@ unsigned int ticks; // must be big enough to hold TICKS_BETWEEN_SEND
 
 int32_t meterId = 1;
 uint32_t seriesId = 1;
+uint64_t lastSentValue = UINT64_MAX;
 
 void setup() {
   sendValueFlag = 0;
   ticks = 0;
   calibrationMode = 1;
 
-  Serial.begin(9600);
+  Serial.begin(115200);
   
   comparator.addUnitIncrementListener(&meter);  
 
@@ -97,7 +93,7 @@ void loop() {
       interrupts();
       // protected access to variables shared with ISR END
 
-      {
+      if(currentValue != lastSentValue) {
         MeterReader_CounterUpdate mymessage = {meterId, seriesId, currentValue};
         uint8_t buffer[MeterReader_CounterUpdate_size];
         
@@ -108,13 +104,14 @@ void loop() {
         Serial.write(buffer, stream.bytes_written);
         uint32_t crc = crc_array(buffer, stream.bytes_written);
         serial_write_uint32(crc);
+
+        lastSentValue = currentValue;
       }
     }
 }
 
 void serial_write_uint32(uint32_t val) {
   uint8_t bytes[4];
-  val = htonl(val); // convert to network byte order
   bytes[0] = (val >> 24) & 0xFF;
   bytes[1] = (val >> 16) & 0xFF;
   bytes[2] = (val >> 8) & 0xFF;
