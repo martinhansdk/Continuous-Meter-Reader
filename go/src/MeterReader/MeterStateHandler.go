@@ -79,5 +79,7 @@ func (msh *MeterStateHandler) Translate(msg *CounterUpdate) *MeterUpdate {
 		Value:      meter.LastCount,
 	}
 
+	msh.mdb.InsertMeasurement(&umsg)
+
 	return &umsg
 }

@@ -87,8 +87,15 @@ func (mdb *MeterDB) GetMeterState() map[int32]*Meter {
 	return meters
 }
 
-func (mdb *MeterDB) InsertMeasurement() {
-	// FIXME
+func (mdb *MeterDB) InsertMeasurement(msg *MeterUpdate) {
+	_, err := mdb.db.Exec(`
+			INSERT INTO measurements(meter, measured_at, value)
+			VALUES(($1), ($2), ($3));`, msg.MeterId, msg.MeasuredAt, msg.Value)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 }
 
 func (mdb *MeterDB) GetJSONFromDB(w rest.ResponseWriter, query string, args ...interface{}) {
