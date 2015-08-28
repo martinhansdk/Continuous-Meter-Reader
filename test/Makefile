@@ -14,11 +14,11 @@
 
 # Points to the root of Google Test, relative to where this file is.
 # Remember to tweak this if you move this file.
-GMOCK_DIR = ../../gmock-1.6.0
+GMOCK_DIR = ../googlemock
 GTEST_DIR = $(GMOCK_DIR)/gtest
 
 # Where to find user code.
-USER_DIR = ..
+USER_DIR = ../lib/Meter
 VPATH = $(USER_DIR) .
 
 # Test sources

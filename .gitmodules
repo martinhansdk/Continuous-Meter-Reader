@@ -1,0 +1,7 @@
+[submodule "Arduino-Makefile"]
+	path = Arduino-Makefile
+	url = https://github.com/WeAreLeka/Arduino-Makefile.git
+
+[submodule "googlemock"]
+	path = googlemock
+	url = https://github.com/martinhansdk/googlemock

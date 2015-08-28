@@ -1,8 +1,0 @@
-ARD_REV ?= 0018
-ARD_HOME ?= /usr/share/arduino
-ARD_BIN ?= /usr/bin
-ARD_LIBDIR ?= $(ARD_HOME)/libraries
-AVRDUDE ?= /usr/bin/avrdude
-AVRDUDE_CONF ?= /etc/avrdude.conf
-PROGRAMMER ?= arduino
-MON_SPEED ?= 9600

@@ -13,7 +13,7 @@
                    ((x)<< 8 & 0x00FF0000UL) | \
                    ((x)>> 8 & 0x0000FF00UL) | \
                    ((x)>>24 & 0x000000FFUL) )
-
+void serial_write_uint32(uint32_t val);
 
 Comparator comparator;
 Meter meter;
@@ -32,7 +32,7 @@ int sendValueFlag;
 unsigned int ticks; // must be big enough to hold TICKS_BETWEEN_SEND
 
 int32_t meterId = 1;
-int32_t seriesId = 1;
+uint32_t seriesId = 1;
 
 void setup() {
   sendValueFlag = 0;

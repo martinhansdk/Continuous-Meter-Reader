@@ -8,6 +8,15 @@ static const PROGMEM prog_uint32_t crc_table[16] = {
     0x9b64c2b0, 0x86d3d2d4, 0xa00ae278, 0xbdbdf21c
 };
 
+uint32_t crc_array(uint8_t *s, int len)
+{
+  uint32_t crc = ~0L;
+  while (len--)
+    crc = crc_update(crc, *s++);
+  crc = ~crc;
+  return crc;
+}
+
 uint32_t crc_update(uint32_t crc, uint8_t data)
 {
     uint32_t tbl_idx;
@@ -18,11 +27,4 @@ uint32_t crc_update(uint32_t crc, uint8_t data)
     return crc;
 }
 
-uint32_t crc_array(uint8_t *s, int len)
-{
-  uint32_t crc = ~0L;
-  while (len--)
-    crc = crc_update(crc, *s++);
-  crc = ~crc;
-  return crc;
-}
+
