@@ -7,12 +7,14 @@
 #include "CounterUpdate_pb.h"
 #include "pb_encode.h"
 #include "crc32.h"
+#include "settings.h"
 
 void serial_write_uint32(uint32_t val);
 
 Comparator comparator;
 Meter meter;
 Histogram histogram;
+Settings settings;
 
 #define ADCPIN A0
 const int SAMPLE_FREQUENCY = 200; // Hz
@@ -26,14 +28,17 @@ int calibrationMode;
 int sendValueFlag;
 unsigned int ticks; // must be big enough to hold TICKS_BETWEEN_SEND
 
-int32_t meterId = 1;
-uint32_t seriesId = 1;
 uint64_t lastSentValue = UINT64_MAX;
 
 void setup() {
   sendValueFlag = 0;
   ticks = 0;
   calibrationMode = 1;
+
+  // pick the next series
+  settings.load();
+  settings.seriesId += 1;
+  settings.save();
 
   Serial.begin(115200);
   
@@ -94,7 +99,7 @@ void loop() {
       // protected access to variables shared with ISR END
 
       if(currentValue != lastSentValue) {
-        MeterReader_CounterUpdate mymessage = {meterId, seriesId, currentValue};
+        MeterReader_CounterUpdate mymessage = {settings.meterId, settings.seriesId, currentValue};
         uint8_t buffer[MeterReader_CounterUpdate_size];
         
         pb_ostream_t stream = pb_ostream_from_buffer(buffer, sizeof(buffer));
