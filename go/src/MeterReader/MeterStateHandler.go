@@ -2,6 +2,7 @@ package MeterReader
 
 import (
 	"log"
+	"time"
 )
 
 type Meter struct {
@@ -14,10 +15,11 @@ type Meter struct {
 }
 
 type MeterUpdate struct {
-	MeterId int32  `json:"meter"`
-	Unit    string `json:"unit"`
-	Name    string `json:"name"`
-	Value   uint64 `json:"value"`
+	MeterId    int32     `json:"meter"`
+	MeasuredAt time.Time `json:"measured_at"`
+	Unit       string    `json:"unit"`
+	Name       string    `json:"name"`
+	Value      uint64    `json:"value"`
 }
 
 type MeterStateHandler struct {
@@ -69,7 +71,13 @@ func (msh *MeterStateHandler) Translate(msg *CounterUpdate) *MeterUpdate {
 
 	log.Printf("meterid=%d series=%d counter=%d -> absolute=%d\n", MeterId, SeriesId, CurrentCounterValue, meter.LastCount)
 
-	umsg := MeterUpdate{MeterId: meter.MeterId, Unit: meter.Unit, Name: meter.Name, Value: meter.LastCount}
+	umsg := MeterUpdate{
+		MeterId:    meter.MeterId,
+		MeasuredAt: time.Now(),
+		Unit:       meter.Unit,
+		Name:       meter.Name,
+		Value:      meter.LastCount,
+	}
 
 	return &umsg
 }
