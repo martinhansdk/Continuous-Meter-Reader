@@ -4,19 +4,18 @@
 #include "Histogram.h"
 #include "Meter.h"
 #include "Comparator.h"
-#include "CounterUpdate_pb.h"
-#include "pb_encode.h"
-#include "crc32.h"
+#include "MeterReader_pb.h"
 #include "settings.h"
+#include "Communicate.h"
 
 void serial_write_uint32(uint32_t val);
 
 Comparator comparator;
 Meter meter;
 Histogram histogram;
-Settings settings;
+Settings<MeterReader_Settings> settings;
 
-#define ADCPIN A0
+#define ADCPIN A7
 const int SAMPLE_FREQUENCY = 200; // Hz
 const int CALIBRATION_SECONDS = 5;
 const int SAMPLE_TIME = 1000 / SAMPLE_FREQUENCY;
@@ -37,11 +36,17 @@ void setup() {
 
   // pick the next series
   settings.load();
-  settings.seriesId += 1;
+  settings.s.seriesId += 1;
   settings.save();
 
+  settings.s.risingEdgeAmounts_count = 6;
+  settings.s.fallingEdgeAmounts_count = 6;
+
   Serial.begin(115200);
+  sendSettings(Serial, settings.s);
   
+  comparator.setThreshold(settings.s.threshold);
+  comparator.setHysteresis(settings.s.hysteresis);
   comparator.addUnitIncrementListener(&meter);  
 
  // initialize timer1 
@@ -99,28 +104,10 @@ void loop() {
       // protected access to variables shared with ISR END
 
       if(currentValue != lastSentValue) {
-        MeterReader_CounterUpdate mymessage = {settings.meterId, settings.seriesId, currentValue};
-        uint8_t buffer[MeterReader_CounterUpdate_size];
-        
-        pb_ostream_t stream = pb_ostream_from_buffer(buffer, sizeof(buffer));
-        pb_encode(&stream, MeterReader_CounterUpdate_fields, &mymessage);
-        Serial.write("AA");
-        serial_write_uint32(stream.bytes_written); 
-        Serial.write(buffer, stream.bytes_written);
-        uint32_t crc = crc_array(buffer, stream.bytes_written);
-        serial_write_uint32(crc);
+        sendCounterUpdate(Serial, settings.s.meterId, settings.s.seriesId, currentValue);
 
         lastSentValue = currentValue;
       }
     }
 }
 
-void serial_write_uint32(uint32_t val) {
-  uint8_t bytes[4];
-  bytes[0] = (val >> 24) & 0xFF;
-  bytes[1] = (val >> 16) & 0xFF;
-  bytes[2] = (val >> 8) & 0xFF;
-  bytes[3] = val & 0xFF;
-  
-  Serial.write(bytes, 4);
-}

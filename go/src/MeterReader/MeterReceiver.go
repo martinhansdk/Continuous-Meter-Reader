@@ -2,6 +2,7 @@ package MeterReader
 
 import (
 	"encoding/binary"
+	"encoding/json"
 	"github.com/golang/protobuf/proto"
 	"hash/crc32"
 	"io"
@@ -9,9 +10,9 @@ import (
 	"os"
 )
 
-const MAX_PROTOBUF_MSG_LEN = 28
+const MAX_PROTOBUF_MSG_LEN = 121
 
-var castagnoliTable = crc32.MakeTable(crc32.IEEE) // see http://golang.org/pkg/hash/crc32/#pkg-constants
+var crcTable = crc32.MakeTable(crc32.IEEE) // see http://golang.org/pkg/hash/crc32/#pkg-constants
 
 func HandleProtoClient(conn io.ReadCloser, c chan *CounterUpdate) {
 	var len uint32
@@ -29,11 +30,12 @@ func HandleProtoClient(conn io.ReadCloser, c chan *CounterUpdate) {
 		for seen != 2 {
 			_, err := conn.Read(buf)
 			if err == io.EOF {
-				log.Printf("EOF reached")
+				log.Printf("Preamble: EOF reached\n")
+				break
+			} else if err != nil {
+				log.Printf("Preamble: Error %s\n", err)
 				break
 			}
-
-			CheckError(err)
 
 			if buf[0] == 'A' {
 				seen += 1
@@ -50,56 +52,75 @@ func HandleProtoClient(conn io.ReadCloser, c chan *CounterUpdate) {
 		//Read the length field
 		err := binary.Read(conn, binary.BigEndian, &len)
 		if err == io.EOF {
-			log.Printf("EOF reached")
+			log.Printf("Length: EOF reached\n")
+			break
+		} else if err != nil {
+			log.Printf("Length: Error %s\n", err)
 			break
 		}
 
-		CheckError(err)
 		log.Println("len=", len)
 
 		if len > MAX_PROTOBUF_MSG_LEN {
-			log.Println("Message length unrealistically large. Skipping. len=", len)
+			log.Println("Message length unrealistically large. Skipping. len=%s", len)
 			continue
 		}
 
 		//Create a data buffer of type byte slice with capacity for the message
 		data := make([]byte, len)
 		//Read the data waiting on the connection and put it in the data buffer
-		n, err := conn.Read(data)
+		n, err := io.ReadFull(conn, data)
 		if err == io.EOF {
-			log.Printf("EOF reached")
+			log.Printf("Message: EOF reached\n")
+			break
+		} else if err != nil {
+			log.Printf("Message: Error %s\n", err)
 			break
 		}
-		CheckError(err)
+
+		fp, _ := os.Create("/tmp/message.pdata")
+		fp.Write(data)
+		fp.Close()
 
 		// Read the checksum and match it against the received data
-		crc := crc32.New(castagnoliTable)
+		crc := crc32.New(crcTable)
 		crc.Write(data)
 		var expectedCRC uint32
 		err = binary.Read(conn, binary.BigEndian, &expectedCRC)
 		if err == io.EOF {
-			log.Printf("EOF reached")
+			log.Printf("Checksum: EOF reached\n")
+			break
+		} else if err != nil {
+			log.Printf("Checksum: Error %s\n", err)
 			break
 		}
-		CheckError(err)
 
 		if crc.Sum32() != expectedCRC {
-			log.Println("Checksum mismatch, skipping")
+			log.Printf("Checksum mismatch, skipping. Header says 0x%08x, calculated 0x%08x\n", expectedCRC, crc.Sum32())
 			continue
 		}
 
-		protodata := new(CounterUpdate)
-		//Convert all the data retrieved into the CounterUpdate struct type
+		protodata := new(Message)
+		//Convert all the data retrieved into the Message struct type
 		err = proto.Unmarshal(data[0:n], protodata)
-		CheckError(err)
-		//Push the protobuf message into a channel
-		c <- protodata
-	}
-}
+		if err != nil {
+			log.Printf("Unmarshal: Error %s\n", err)
+			break
+		}
 
-func CheckError(err error) {
-	if err != nil {
-		log.Fatal("Fatal error: %s", err.Error())
-		os.Exit(1)
+		counterUpdate := protodata.GetUpdate()
+		if counterUpdate != nil {
+			c <- counterUpdate
+		}
+
+		settings := protodata.GetSettings()
+		if settings != nil {
+			b, err := json.Marshal(settings)
+			if err != nil {
+				log.Println("JSON encode: Error %s", err)
+			} else {
+				os.Stdout.Write(b)
+			}
+		}
 	}
 }

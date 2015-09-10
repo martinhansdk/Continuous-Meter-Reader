@@ -20,7 +20,10 @@ func main() {
 	c := make(chan *MeterReader.CounterUpdate)
 	log.Println("Listening to port 2110 for meter events")
 	listener, err := net.Listen("tcp", "127.0.0.1:2110")
-	MeterReader.CheckError(err)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	go func() {
 		for {
 			if conn, err := listener.Accept(); err == nil {
@@ -34,7 +37,7 @@ func main() {
 
 	// Listen to the serial port
 	go func() {
-		config := &serial.Config{Name: "/dev/ttyUSB0", Baud: 115200}
+		config := &serial.Config{Name: "/dev/ttyUSB1", Baud: 115200}
 
 		for {
 			ser, err := serial.OpenPort(config)

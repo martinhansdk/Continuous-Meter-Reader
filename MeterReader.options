@@ -1,0 +1,3 @@
+# We can only need 6 digital sensors
+MeterReader.Settings.risingEdgeAmounts   max_count:6
+MeterReader.Settings.fallingEdgeAmounts  max_count:6

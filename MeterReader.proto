@@ -1,0 +1,50 @@
+package MeterReader;
+
+message Message {
+  oneof message {
+    CounterUpdate update = 1;
+    StartCalibration calibrate = 2;
+    Settings settings = 3;
+  }
+}
+
+message CounterUpdate {
+  required int32 meterId = 1;
+	required uint32 seriesId = 2;
+	required uint64 currentCounterValue = 3;
+}
+
+message StartCalibration {
+}
+
+// Example settings structure
+message Settings {
+  // The variables of our settings
+  required int32 meterId = 1;
+  required uint32 seriesId = 2;
+
+  // Modes
+  enum SendProtocol { 
+    ASCII=0;
+    PROTOBUF=1;
+  };
+  enum CommunicationChannel { 
+    SERIAL=0;
+    WIRELESS=1; 
+  };
+  enum SamplingMode { 
+    ANALOG=0;
+    DIGITAL=1;
+  };
+  required SendProtocol sendProtocol = 3;
+  required CommunicationChannel communicationChannel = 4;
+  required SamplingMode samplingMode = 5;
+
+  // Analog sampling: comparator settings
+  required uint32 threshold = 6;
+  required uint32 hysteresis = 7;
+
+  // Digital sampling: edge amounts
+  repeated uint32 risingEdgeAmounts = 8;
+  repeated uint32 fallingEdgeAmounts = 9;
+};

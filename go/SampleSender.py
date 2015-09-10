@@ -1,6 +1,6 @@
 """A simple script to send some synthetic values to the MeterReceiver server to test it."""
 
-import CounterUpdate_pb2
+import MeterReader_pb2
 import random
 import socket
 import struct
@@ -38,9 +38,9 @@ def send_garbage(sock, amount):
 series=0
 count=0
 while True:
-    inc = CounterUpdate_pb2.CounterUpdate()
+    msg = MeterReader_pb2.Message()
 
-    inc.meterId = 1
+    msg.update.meterId = 1
     if random.randint(0,10) == 1:
         # new series
         series += 1
@@ -48,10 +48,10 @@ while True:
 
     count += random.randint(0, 10)
 
-    inc.seriesId = series
-    inc.currentCounterValue = count
+    msg.update.seriesId = series
+    msg.update.currentCounterValue = count
 
-    send_message(s, inc)
+    send_message(s, msg)
     if random.randint(0, 10) < 3:
         send_garbage(s, random.randint(1, 50))
 
