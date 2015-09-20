@@ -139,6 +139,13 @@ func SendSettings(conn io.Writer, settings *Settings) {
 	sendMessage(conn, msg)
 }
 
+func SendStartCalibration(conn io.Writer) {
+	msg := new(Message)
+	msg.Calibrate = new(StartCalibration)
+
+	sendMessage(conn, msg)
+}
+
 func sendMessage(conn io.Writer, message *Message) {
 	_, err := io.WriteString(conn, "AA") // preamble
 	if err != nil {

@@ -5,15 +5,20 @@ import (
 	"flag"
 	"github.com/tarm/serial"
 	"log"
+	"time"
 )
 
 func main() {
 	var serialport = flag.String("serial", "/dev/ttyUSB0", "The serial port to use to connect")
 	var id = flag.Int("id", -1, "Set the meter id")
+	var calibrate = flag.Bool("calibrate", false, "Start calibration")
 
 	flag.Parse()
 
-	config := &serial.Config{Name: *serialport, Baud: 9600}
+	config := &serial.Config{Name: *serialport, Baud: 57600}
+	// Opening the port resets the device. First the bootloader runs for half a second, then the actual application loads.
+	// Wait for this to happen before attempting to talk to the device.
+	time.Sleep(1 * time.Second)
 
 	updatechan := make(chan *MeterReader.CounterUpdate)
 	settingschan := make(chan *MeterReader.Settings)
@@ -40,17 +45,27 @@ func main() {
 
 	log.Print("id=", *id)
 
-	changed := false
+	changedSettings := false
+	expectSettingsResponse := false
+
+	if *calibrate {
+		expectSettingsResponse = true
+		MeterReader.SendStartCalibration(ser)
+	}
+
 	if *id != -1 {
-		changed = true
+		changedSettings = true
+		expectSettingsResponse = true
 		var _id = int32(*id)
 		settings.MeterId = &_id
 	}
 
-	if changed {
+	if changedSettings {
 		MeterReader.PrintSettings(settings)
 		MeterReader.SendSettings(ser, settings)
+	}
 
+	if expectSettingsResponse {
 		MeterReader.PrintSettings(<-settingschan)
 	}
 }

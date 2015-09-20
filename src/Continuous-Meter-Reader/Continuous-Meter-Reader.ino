@@ -23,17 +23,18 @@ const int SAMPLES_TO_CALIBRATE = CALIBRATION_SECONDS*1000/SAMPLE_TIME;
 const int TICKS_BETWEEN_SEND = 40; // 0.2 seconds
 
 int calibrationSamples=SAMPLES_TO_CALIBRATE;
-bool calibrationMode;
-int sendValueFlag;
+bool calibrationMode, calibrationDone;
+bool sendValueFlag;
 unsigned int ticks; // must be big enough to hold TICKS_BETWEEN_SEND
 Receiver<MeterReader_Message, MeterReader_Message_fields> serialinput(Serial);
 
 uint64_t lastSentValue = UINT64_MAX;
 
 void setup() {
-  sendValueFlag = 0;
+  sendValueFlag = false;
   ticks = 0;
-  calibrationMode = 1;
+  calibrationMode = false;
+  calibrationDone = false;
 
   // pick the next series
   settings.load();
@@ -43,11 +44,11 @@ void setup() {
   settings.s.risingEdgeAmounts_count = 6;
   settings.s.fallingEdgeAmounts_count = 6;
 
-  Serial.begin(9600);
+  Serial.begin(57600);
 
   // the serial port does not work reliably right after initializing 
   // the port, this delay makes sure it's ready before we use it
-  delay(200);
+  delay(500);
   sendLog(Serial, MeterReader_LogMessage_Type_NOTE, "Rebooted");
   sendSettings(Serial, settings.s);
   
@@ -84,14 +85,15 @@ ISR(TIMER1_COMPA_vect)          // timer compare interrupt service routine
       int threshold=(high+low)/2;    
       comparator.setHysteresis(hysteresis);
       comparator.setThreshold(threshold);    
-      calibrationMode = 0;
+      calibrationMode = false;
+      calibrationDone = true;
     }
   } else {
     comparator.sample(sensorValue);  
 
     ticks++;    
     if(ticks > TICKS_BETWEEN_SEND) {
-      sendValueFlag = 1;
+      sendValueFlag = true;
       ticks = 0;
     }
   }
@@ -111,8 +113,15 @@ void loop() {
 
       if(currentValue != lastSentValue) {
         sendCounterUpdate(Serial, settings.s.meterId, settings.s.seriesId, currentValue);
-
         lastSentValue = currentValue;
+      }
+
+      if(calibrationDone) {
+        calibrationDone = false;
+        settings.s.threshold = comparator.getThreshold();
+        settings.s.hysteresis = comparator.getHysteresis();
+        settings.save();
+        sendSettings(Serial, settings.s);
       }
 
       if(serialinput.process()) {

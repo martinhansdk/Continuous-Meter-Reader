@@ -37,7 +37,7 @@ func main() {
 
 	// Listen to the serial port
 	go func() {
-		config := &serial.Config{Name: "/dev/ttyUSB1", Baud: 115200}
+		config := &serial.Config{Name: "/dev/ttyUSB1", Baud: 57600}
 
 		for {
 			ser, err := serial.OpenPort(config)

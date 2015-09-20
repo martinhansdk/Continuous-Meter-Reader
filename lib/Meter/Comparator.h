@@ -25,6 +25,8 @@ public:
   void addUnitIncrementListener(UnitIncrementListener *listener);
   void setThreshold(sample_t value);
   void setHysteresis(sample_t value);
+  sample_t getThreshold() { return threshold; };
+  sample_t getHysteresis() { return hysteresis; };
 };
 
 #endif
