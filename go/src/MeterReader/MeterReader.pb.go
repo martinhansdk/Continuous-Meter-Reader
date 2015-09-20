@@ -10,6 +10,7 @@ It is generated from these files:
 
 It has these top-level messages:
 	Message
+	LogMessage
 	CounterUpdate
 	StartCalibration
 	Settings
@@ -22,6 +23,39 @@ import math "math"
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = math.Inf
+
+type LogMessage_Type int32
+
+const (
+	LogMessage_ERROR LogMessage_Type = 0
+	LogMessage_NOTE  LogMessage_Type = 1
+)
+
+var LogMessage_Type_name = map[int32]string{
+	0: "ERROR",
+	1: "NOTE",
+}
+var LogMessage_Type_value = map[string]int32{
+	"ERROR": 0,
+	"NOTE":  1,
+}
+
+func (x LogMessage_Type) Enum() *LogMessage_Type {
+	p := new(LogMessage_Type)
+	*p = x
+	return p
+}
+func (x LogMessage_Type) String() string {
+	return proto.EnumName(LogMessage_Type_name, int32(x))
+}
+func (x *LogMessage_Type) UnmarshalJSON(data []byte) error {
+	value, err := proto.UnmarshalJSONEnum(LogMessage_Type_value, data, "LogMessage_Type")
+	if err != nil {
+		return err
+	}
+	*x = LogMessage_Type(value)
+	return nil
+}
 
 // Modes
 type Settings_SendProtocol int32
@@ -127,6 +161,7 @@ type Message struct {
 	Update           *CounterUpdate    `protobuf:"bytes,1,opt,name=update" json:"update,omitempty"`
 	Calibrate        *StartCalibration `protobuf:"bytes,2,opt,name=calibrate" json:"calibrate,omitempty"`
 	Settings         *Settings         `protobuf:"bytes,3,opt,name=settings" json:"settings,omitempty"`
+	Log              *LogMessage       `protobuf:"bytes,4,opt,name=log" json:"log,omitempty"`
 	XXX_unrecognized []byte            `json:"-"`
 }
 
@@ -153,6 +188,37 @@ func (m *Message) GetSettings() *Settings {
 		return m.Settings
 	}
 	return nil
+}
+
+func (m *Message) GetLog() *LogMessage {
+	if m != nil {
+		return m.Log
+	}
+	return nil
+}
+
+type LogMessage struct {
+	Type             *LogMessage_Type `protobuf:"varint,1,req,name=type,enum=MeterReader.LogMessage_Type" json:"type,omitempty"`
+	Text             *string          `protobuf:"bytes,2,req,name=text" json:"text,omitempty"`
+	XXX_unrecognized []byte           `json:"-"`
+}
+
+func (m *LogMessage) Reset()         { *m = LogMessage{} }
+func (m *LogMessage) String() string { return proto.CompactTextString(m) }
+func (*LogMessage) ProtoMessage()    {}
+
+func (m *LogMessage) GetType() LogMessage_Type {
+	if m != nil && m.Type != nil {
+		return *m.Type
+	}
+	return LogMessage_ERROR
+}
+
+func (m *LogMessage) GetText() string {
+	if m != nil && m.Text != nil {
+		return *m.Text
+	}
+	return ""
 }
 
 type CounterUpdate struct {
@@ -280,6 +346,7 @@ func (m *Settings) GetFallingEdgeAmounts() []uint32 {
 }
 
 func init() {
+	proto.RegisterEnum("MeterReader.LogMessage_Type", LogMessage_Type_name, LogMessage_Type_value)
 	proto.RegisterEnum("MeterReader.Settings_SendProtocol", Settings_SendProtocol_name, Settings_SendProtocol_value)
 	proto.RegisterEnum("MeterReader.Settings_CommunicationChannel", Settings_CommunicationChannel_name, Settings_CommunicationChannel_value)
 	proto.RegisterEnum("MeterReader.Settings_SamplingMode", Settings_SamplingMode_name, Settings_SamplingMode_value)

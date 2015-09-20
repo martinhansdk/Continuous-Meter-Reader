@@ -1,7 +1,7 @@
 #!/bin/bash
 
 protoc --plugin=protoc-gen-go=go/bin/protoc-gen-go --go_out=go/src/MeterReader/ MeterReader.proto
-protoc --python_out=go/ MeterReader.proto
+protoc --python_out=utils/ MeterReader.proto
 
 ## generate code for embedded C and fix the names so the Makefile can find them
 protoc --plugin=protoc-gen-nanopb=/home/martin/code/nanopb/generator/protoc-gen-nanopb --nanopb_out=lib/MeterReader_pb MeterReader.proto

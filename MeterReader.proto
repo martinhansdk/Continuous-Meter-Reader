@@ -5,7 +5,18 @@ message Message {
     CounterUpdate update = 1;
     StartCalibration calibrate = 2;
     Settings settings = 3;
+    LogMessage log = 4;
   }
+}
+
+message LogMessage {
+  enum Type { 
+    ERROR=0;
+    NOTE=1;
+  };
+
+  required Type type = 1;
+  required string text = 2;
 }
 
 message CounterUpdate {

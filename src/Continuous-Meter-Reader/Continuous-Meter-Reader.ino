@@ -23,9 +23,10 @@ const int SAMPLES_TO_CALIBRATE = CALIBRATION_SECONDS*1000/SAMPLE_TIME;
 const int TICKS_BETWEEN_SEND = 40; // 0.2 seconds
 
 int calibrationSamples=SAMPLES_TO_CALIBRATE;
-int calibrationMode;
+bool calibrationMode;
 int sendValueFlag;
 unsigned int ticks; // must be big enough to hold TICKS_BETWEEN_SEND
+Receiver<MeterReader_Message, MeterReader_Message_fields> serialinput(Serial);
 
 uint64_t lastSentValue = UINT64_MAX;
 
@@ -42,7 +43,12 @@ void setup() {
   settings.s.risingEdgeAmounts_count = 6;
   settings.s.fallingEdgeAmounts_count = 6;
 
-  Serial.begin(115200);
+  Serial.begin(9600);
+
+  // the serial port does not work reliably right after initializing 
+  // the port, this delay makes sure it's ready before we use it
+  delay(200);
+  sendLog(Serial, MeterReader_LogMessage_Type_NOTE, "Rebooted");
   sendSettings(Serial, settings.s);
   
   comparator.setThreshold(settings.s.threshold);
@@ -107,6 +113,27 @@ void loop() {
         sendCounterUpdate(Serial, settings.s.meterId, settings.s.seriesId, currentValue);
 
         lastSentValue = currentValue;
+      }
+
+      if(serialinput.process()) {
+        switch(serialinput.message.which_message) {
+          case MeterReader_Message_calibrate_tag:
+            noInterrupts();
+            calibrationMode = true;
+            calibrationSamples=SAMPLES_TO_CALIBRATE;
+            interrupts();
+            break;
+          case MeterReader_Message_settings_tag:
+            noInterrupts();
+            settings.s = serialinput.message.message.settings;
+            interrupts();
+            settings.save();
+            sendSettings(Serial, settings.s);
+            break;
+          default:
+            // ignore message
+            break;
+        }
       }
     }
 }

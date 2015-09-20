@@ -14,7 +14,7 @@ const MAX_PROTOBUF_MSG_LEN = 121
 
 var crcTable = crc32.MakeTable(crc32.IEEE) // see http://golang.org/pkg/hash/crc32/#pkg-constants
 
-func HandleProtoClient(conn io.ReadCloser, c chan *CounterUpdate) {
+func HandleProtoClient(conn io.ReadCloser, updateChan chan *CounterUpdate, settingsChan chan *Settings) {
 	var len uint32
 
 	log.Println("Connection established")
@@ -22,6 +22,8 @@ func HandleProtoClient(conn io.ReadCloser, c chan *CounterUpdate) {
 	defer conn.Close()
 
 	for {
+
+		log.Print("Waiting for data")
 
 		// Find the first occurrence of the magic string which is AA
 		buf := make([]byte, 1)
@@ -40,6 +42,10 @@ func HandleProtoClient(conn io.ReadCloser, c chan *CounterUpdate) {
 			if buf[0] == 'A' {
 				seen += 1
 			} else {
+				if seen > 0 {
+					log.Printf("Discarded: %d", int('A'))
+				}
+				log.Printf("Discarded: %d", int(buf[0]))
 				seen = 0
 				garbage += 1
 			}
@@ -50,7 +56,7 @@ func HandleProtoClient(conn io.ReadCloser, c chan *CounterUpdate) {
 		}
 
 		//Read the length field
-		err := binary.Read(conn, binary.BigEndian, &len)
+		err := binary.Read(conn, binary.LittleEndian, &len)
 		if err == io.EOF {
 			log.Printf("Length: EOF reached\n")
 			break
@@ -77,6 +83,7 @@ func HandleProtoClient(conn io.ReadCloser, c chan *CounterUpdate) {
 			log.Printf("Message: Error %s\n", err)
 			break
 		}
+		log.Printf("n=%d", n)
 
 		fp, _ := os.Create("/tmp/message.pdata")
 		fp.Write(data)
@@ -86,7 +93,7 @@ func HandleProtoClient(conn io.ReadCloser, c chan *CounterUpdate) {
 		crc := crc32.New(crcTable)
 		crc.Write(data)
 		var expectedCRC uint32
-		err = binary.Read(conn, binary.BigEndian, &expectedCRC)
+		err = binary.Read(conn, binary.LittleEndian, &expectedCRC)
 		if err == io.EOF {
 			log.Printf("Checksum: EOF reached\n")
 			break
@@ -110,17 +117,63 @@ func HandleProtoClient(conn io.ReadCloser, c chan *CounterUpdate) {
 
 		counterUpdate := protodata.GetUpdate()
 		if counterUpdate != nil {
-			c <- counterUpdate
+			updateChan <- counterUpdate
 		}
 
 		settings := protodata.GetSettings()
 		if settings != nil {
-			b, err := json.Marshal(settings)
-			if err != nil {
-				log.Println("JSON encode: Error %s", err)
-			} else {
-				os.Stdout.Write(b)
-			}
+			settingsChan <- settings
 		}
+
+		logmsg := protodata.GetLog()
+		if logmsg != nil {
+			log.Printf("%s : Received '%s'", logmsg.GetType().String(), logmsg.GetText())
+		}
+	}
+}
+
+func SendSettings(conn io.Writer, settings *Settings) {
+	msg := new(Message)
+	msg.Settings = settings
+
+	sendMessage(conn, msg)
+}
+
+func sendMessage(conn io.Writer, message *Message) {
+	_, err := io.WriteString(conn, "AA") // preamble
+	if err != nil {
+		log.Fatal("unable to send data: ", err)
+	}
+
+	data, err := proto.Marshal(message)
+	if err != nil {
+		log.Fatal("marshaling error: ", err)
+	}
+
+	err = binary.Write(conn, binary.LittleEndian, int32(len(data)))
+	if err != nil {
+		log.Fatal("unable to send data: ", err)
+	}
+
+	_, err = conn.Write(data)
+	if err != nil {
+		log.Fatal("unable to send data: ", err)
+	}
+
+	crc := crc32.New(crcTable)
+	crc.Write(data)
+	err = binary.Write(conn, binary.LittleEndian, int32(crc.Sum32()))
+	if err != nil {
+		log.Fatal("unable to send data: ", err)
+	}
+}
+
+func PrintSettings(settings *Settings) {
+	b, err := json.Marshal(settings)
+	if err != nil {
+		log.Println("JSON encode: Error %s", err)
+	} else {
+		os.Stdout.Write(b)
+		io.WriteString(os.Stdout, "\n")
 	}
 }

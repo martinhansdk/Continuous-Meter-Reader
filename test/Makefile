@@ -18,20 +18,24 @@ GMOCK_DIR = ../googlemock
 GTEST_DIR = $(GMOCK_DIR)/gtest
 
 # Where to find user code.
-USER_DIR = ../lib/Meter
+USER_DIR = ../lib/Meter ../lib/MeterReader_pb ../lib/crc32 ../src/Continuous-Meter-Reader 
 VPATH = $(USER_DIR) .
 
 # Test sources
-SRC_FILES = Comparator.cpp Histogram.cpp Meter.cpp
-TEST_FILES = ComparatorTest.cpp HistogramTest.cpp MeterTest.cpp
+SRC_CXX_FILES = Comparator.cpp Histogram.cpp Meter.cpp Communicate.cpp
+SRC_C_FILES = pb_encode.c pb_decode.c pb_common.c MeterReader_pb.c crc32.c
+TEST_FILES = ComparatorTest.cpp HistogramTest.cpp MeterTest.cpp CommunicateTest.cpp SettingsTest.cpp EEPROM.cpp Stream.cpp
 
-OBJS = $(SRC_FILES:.cpp=.o) $(TEST_FILES:.cpp=.o)
+OBJS = $(SRC_CXX_FILES:.cpp=.o) $(SRC_C_FILES:.c=.o) $(TEST_FILES:.cpp=.o)
 
 # Flags passed to the preprocessor.
-CPPFLAGS += -I$(GTEST_DIR)/include -I$(GMOCK_DIR)/include -I. -I..
+CPPFLAGS += -I$(GTEST_DIR)/include -I$(GMOCK_DIR)/include  -I. -I.. -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
+
+CXX=clang++
 
 # Flags passed to the C++ compiler.
-CXXFLAGS += -g -Wall -Wextra -I$(USER_DIR)
+CXXFLAGS += -g -O0 -Wall -Wextra $(foreach d, $(USER_DIR), -I$d)
+CFLAGS = $(CXXFLAGS)
 
 # Flags passed to the linker
 LDFLAGS = -lgtest -lgmock_main -L.
@@ -49,6 +53,9 @@ GMOCK_HEADERS = $(GMOCK_DIR)/include/gmock/*.h \
 
 
 # House-keeping build targets.
+
+test: $(TESTS)
+	./$(TESTS)
 
 all : $(TESTS)
 
@@ -93,3 +100,7 @@ libgmock_main.a : gmock-all.o gmock_main.o
 
 unittests : $(OBJS) libgtest.a libgmock_main.a
 	$(CXX) $(LDFLAGS) -lpthread $^ -o $@
+
+debug:
+	echo OBJS=$(OBJS)
+	echo USER_DIR=$(USER_DIR)

@@ -27,18 +27,24 @@ public:
   void load() {
     // To make sure there are settings, and they are OURS!
     // If nothing is found it won't change anything.
+
     if (EEPROM.read(CONFIG_START + 0) == CONFIG_VERSION[0] &&
       EEPROM.read(CONFIG_START + 1) == CONFIG_VERSION[1] &&
       EEPROM.read(CONFIG_START + 2) == CONFIG_VERSION[2]) {
       for (unsigned int t=0; t<sizeof(T); t++) {
-        *((char*)&s + t) = EEPROM.read(CONFIG_START + t);
+        *((char*)&s + t) = EEPROM.read(CONFIG_START + sizeof(version) - 1 + t);
       }
     }
   }
 
   void save() {
-    for (unsigned int t=0; t<sizeof(Settings); t++)
-      EEPROM.write(CONFIG_START + t, *((char*)&s + t));
+    for (unsigned int t=0; t<3; t++) {
+      EEPROM.write(CONFIG_START + t, CONFIG_VERSION[t]);
+    }
+      
+    for (unsigned int t=0; t<sizeof(T); t++) {
+      EEPROM.write(CONFIG_START + 3 + t, *((char*)&s + t));
+    }
   }
 };
 
