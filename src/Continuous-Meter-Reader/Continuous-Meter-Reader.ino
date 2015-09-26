@@ -5,6 +5,7 @@
 #include "Meter.h"
 #include "Comparator.h"
 #include "MeterReader_pb.h"
+#include "OpticalSensor.h"
 #include "settings.h"
 #include "Communicate.h"
 
@@ -16,9 +17,23 @@ Histogram histogram;
 Settings<MeterReader_Settings> settings;
 
 #define ADCPIN A7
+#define LED_PIN 13
+
+
+
+OpticalSensor digitalSensors[] = {
+    OpticalSensor(8),
+    OpticalSensor(7), 
+    OpticalSensor(6), 
+    OpticalSensor(5), 
+    OpticalSensor(4), 
+    OpticalSensor(3)
+};
+
+
 const int SAMPLE_FREQUENCY = 200; // Hz
 const int CALIBRATION_SECONDS = 5;
-const int SAMPLE_TIME = 1000 / SAMPLE_FREQUENCY;
+const int SAMPLE_TIME = 1000 / SAMPLE_FREQUENCY; // ms
 const int SAMPLES_TO_CALIBRATE = CALIBRATION_SECONDS*1000/SAMPLE_TIME;
 const int TICKS_BETWEEN_SEND = 40; // 0.2 seconds
 
@@ -41,8 +56,17 @@ void setup() {
   settings.s.seriesId += 1;
   settings.save();
 
-  settings.s.risingEdgeAmounts_count = 6;
-  settings.s.fallingEdgeAmounts_count = 6;
+  // sanitize the number of digital sensors
+  if(settings.s.fallingEdgeAmounts_count > 6) {
+    settings.s.risingEdgeAmounts_count = 0;   
+  }
+
+  settings.s.fallingEdgeAmounts_count = settings.s.risingEdgeAmounts_count;
+
+  for(int i=0 ; i < settings.s.risingEdgeAmounts_count ; i++) {
+    digitalSensors[i].setRisingEdgeAmount(settings.s.risingEdgeAmounts[i]);
+    digitalSensors[i].setFallingEdgeAmount(settings.s.fallingEdgeAmounts[i]);
+  }
 
   Serial.begin(57600);
 
@@ -89,14 +113,23 @@ ISR(TIMER1_COMPA_vect)          // timer compare interrupt service routine
       calibrationDone = true;
     }
   } else {
-    comparator.sample(sensorValue);  
+    if(settings.s.samplingMode == MeterReader_Settings_SamplingMode_ANALOG) {
+      comparator.sample(sensorValue);  
+    } else {
+      int change = 0;
+      for(int sensor = 0; sensor < settings.s.risingEdgeAmounts_count ; sensor++) {
+        change += digitalSensors[sensor].getAmount();
+      }
+      meter.add(change);
+    }
 
-    ticks++;    
+    ticks++;
     if(ticks > TICKS_BETWEEN_SEND) {
       sendValueFlag = true;
       ticks = 0;
     }
   }
+
 
 
 }
@@ -118,32 +151,36 @@ void loop() {
 
       if(calibrationDone) {
         calibrationDone = false;
+        noInterrupts();
         settings.s.threshold = comparator.getThreshold();
         settings.s.hysteresis = comparator.getHysteresis();
         settings.save();
+        interrupts();
         sendSettings(Serial, settings.s);
       }
+    }
 
-      if(serialinput.process()) {
-        switch(serialinput.message.which_message) {
-          case MeterReader_Message_calibrate_tag:
-            noInterrupts();
-            calibrationMode = true;
-            calibrationSamples=SAMPLES_TO_CALIBRATE;
-            interrupts();
-            break;
-          case MeterReader_Message_settings_tag:
-            noInterrupts();
-            settings.s = serialinput.message.message.settings;
-            interrupts();
-            settings.save();
-            sendSettings(Serial, settings.s);
-            break;
-          default:
-            // ignore message
-            break;
-        }
+    if(serialinput.process()) {
+      switch(serialinput.message.which_message) {
+        case MeterReader_Message_calibrate_tag:
+          noInterrupts();
+          calibrationMode = true;
+          calibrationSamples=SAMPLES_TO_CALIBRATE;
+          histogram.clear();
+          interrupts();
+          break;
+        case MeterReader_Message_settings_tag:
+          noInterrupts();
+          settings.s = serialinput.message.message.settings;
+          interrupts();
+          settings.save();
+          sendSettings(Serial, settings.s);
+          break;
+        default:
+          // ignore message
+          break;
       }
     }
+    
 }
 

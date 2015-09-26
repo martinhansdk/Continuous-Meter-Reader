@@ -21,7 +21,9 @@ namespace testing {
   			.WillOnce(Return(1)) // second rising
   			.WillRepeatedly(Return(1));
 
-		OpticalSensor sensor(0, 100, 80); // init
+		OpticalSensor sensor(0); // init
+    sensor.setRisingEdgeAmount(100);
+    sensor.setFallingEdgeAmount(80);
 		
 		EXPECT_EQ(0, sensor.getAmount());
 		EXPECT_EQ(100, sensor.getAmount()); // first rising

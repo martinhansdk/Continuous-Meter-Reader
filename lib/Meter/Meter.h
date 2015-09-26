@@ -16,6 +16,7 @@ class Meter : public UnitIncrementListener {
 public:
   Meter();
   virtual void increment();
+  virtual void add(uint64_t amount);
   uint64_t getCurrentValue();
 };
 
