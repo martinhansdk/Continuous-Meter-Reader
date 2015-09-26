@@ -19,7 +19,7 @@ void Histogram::clear() {
 }
 
 sample_t Histogram::getPercentile(unsigned int percentile) {
-  unsigned int noOfSamplesSeen=0;
+  uint16_t noOfSamplesSeen=0;
 
   if(noOfSamples==0) {
     return 0;
@@ -27,7 +27,7 @@ sample_t Histogram::getPercentile(unsigned int percentile) {
   for(unsigned int i = sampleValueToIndex(MIN_SAMPLE_VALUE) ; i <= sampleValueToIndex(MAX_SAMPLE_VALUE) ; i++) {
     
     noOfSamplesSeen+=histogram[i];
-    if( float(100*noOfSamplesSeen)/float(noOfSamples) >= percentile) {
+    if( 100.0*float(noOfSamplesSeen)/float(noOfSamples) >= percentile) {
       return indexToSampleValue(i);
     }
   } 

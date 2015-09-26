@@ -17,7 +17,15 @@ func main() {
 	log.Println("Started Meter Receiver Server")
 
 	//Listen to the TCP port for connections from meter readers
-	c := make(chan *MeterReader.CounterUpdate)
+	updatechan := make(chan *MeterReader.CounterUpdate)
+	settingschan := make(chan *MeterReader.Settings)
+
+	go func() {
+		// drain the channel for settings which we won't need
+		for range settingschan {
+		}
+	}()
+
 	log.Println("Listening to port 2110 for meter events")
 	listener, err := net.Listen("tcp", "127.0.0.1:2110")
 	if err != nil {
@@ -28,7 +36,7 @@ func main() {
 		for {
 			if conn, err := listener.Accept(); err == nil {
 				//If err is nil then that means that data is available for us so we take up this data and pass it to a new goroutine
-				go MeterReader.HandleProtoClient(conn, c)
+				go MeterReader.HandleProtoClient(conn, updatechan, settingschan)
 			} else {
 				continue
 			}
@@ -37,7 +45,7 @@ func main() {
 
 	// Listen to the serial port
 	go func() {
-		config := &serial.Config{Name: "/dev/ttyUSB1", Baud: 57600}
+		config := &serial.Config{Name: "/dev/ttyUSB2", Baud: 57600}
 
 		for {
 			ser, err := serial.OpenPort(config)
@@ -45,7 +53,7 @@ func main() {
 			if err != nil {
 				// ok, retry in a moment
 			} else {
-				MeterReader.HandleProtoClient(ser, c)
+				MeterReader.HandleProtoClient(ser, updatechan, settingschan)
 			}
 
 			time.Sleep(time.Second) // try to open again in a second
@@ -54,7 +62,7 @@ func main() {
 
 	// translate the events from the meters to meter state messages
 	msh := MeterReader.NewMeterStateHandler()
-	tch := msh.Handle(c)
+	tch := msh.Handle(updatechan)
 
 	// socket.io server
 	log.Println("Starting socket.io server")

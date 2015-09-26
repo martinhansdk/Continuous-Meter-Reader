@@ -50,4 +50,25 @@ namespace testing {
     EXPECT_NEAR(216, histogram.getPercentile(90), 1);
   }
 
+  TEST_F(HistogramTest, isUsefulForCalibration2) {
+    
+    /* sample the following histogram shape
+
+       
+                *      *
+                *      *
+                *      *
+                *      *
+         ----------------------->
+     */
+
+    for(int i=0 ; i < 500 ; i++) {
+      histogram.sample(223);
+      histogram.sample(226);      
+    }
+
+    EXPECT_NEAR(220, histogram.getPercentile(25), 0);
+    EXPECT_NEAR(224, histogram.getPercentile(75), 0);
+  }
+
 } // namespace
