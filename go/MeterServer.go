@@ -13,6 +13,8 @@ import (
 	"time"
 )
 
+var serialPorts = [...]string{"/dev/ttyUSB0", "/dev/ttyUSB1", "/dev/ttyUSB2", "/dev/ttyUSB3"}
+
 func main() {
 	log.Println("Started Meter Receiver Server")
 
@@ -45,15 +47,19 @@ func main() {
 
 	// Listen to the serial port
 	go func() {
-		config := &serial.Config{Name: "/dev/ttyUSB2", Baud: 57600}
 
 		for {
-			ser, err := serial.OpenPort(config)
 
-			if err != nil {
-				// ok, retry in a moment
-			} else {
-				MeterReader.HandleProtoClient(ser, updatechan, settingschan)
+			for i := range serialPorts {
+				config := &serial.Config{Name: serialPorts[i], Baud: 57600}
+				ser, err := serial.OpenPort(config)
+
+				if err != nil {
+					// ok, try the next port
+				} else {
+					log.Printf("Opened port %s", serialPorts[i])
+					MeterReader.HandleProtoClient(ser, updatechan, settingschan)
+				}
 			}
 
 			time.Sleep(time.Second) // try to open again in a second
