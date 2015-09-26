@@ -16,20 +16,23 @@
 # Remember to tweak this if you move this file.
 GMOCK_DIR = ../googlemock
 GTEST_DIR = $(GMOCK_DIR)/gtest
+ARDUINO_MOCK_DIR = ../arduino-mock
 
 # Where to find user code.
 USER_DIR = ../lib/Meter ../lib/MeterReader_pb ../lib/crc32 ../src/Continuous-Meter-Reader 
-VPATH = $(USER_DIR) .
+VPATH = $(USER_DIR) $(ARDUINO_MOCK_DIR)/src .
 
 # Test sources
 SRC_CXX_FILES = Comparator.cpp Histogram.cpp Meter.cpp Communicate.cpp
 SRC_C_FILES = pb_encode.c pb_decode.c pb_common.c MeterReader_pb.c crc32.c
-TEST_FILES = ComparatorTest.cpp HistogramTest.cpp MeterTest.cpp CommunicateTest.cpp SettingsTest.cpp EEPROM.cpp Stream.cpp
+TEST_FILES = ComparatorTest.cpp HistogramTest.cpp MeterTest.cpp CommunicateTest.cpp SettingsTest.cpp OpticalSensorTest.cpp \
+             EEPROM.cpp Stream.cpp
+ARDUINO_MOCK_FILES =  Arduino.cc
 
-OBJS = $(SRC_CXX_FILES:.cpp=.o) $(SRC_C_FILES:.c=.o) $(TEST_FILES:.cpp=.o)
+OBJS = $(SRC_CXX_FILES:.cpp=.o) $(SRC_C_FILES:.c=.o) $(ARDUINO_MOCK_FILES:.cc=.o) $(TEST_FILES:.cpp=.o)
 
 # Flags passed to the preprocessor.
-CPPFLAGS += -I$(GTEST_DIR)/include -I$(GMOCK_DIR)/include  -I. -I.. -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
+CPPFLAGS += -I$(GTEST_DIR)/include -I$(GMOCK_DIR)/include -I$(ARDUINO_MOCK_DIR)/include -I$(ARDUINO_MOCK_DIR)/include/arduino-mock -I. -I.. -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
 
 CXX=clang++
 
