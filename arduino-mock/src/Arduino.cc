@@ -1,18 +1,23 @@
 
 #include "arduino-mock/Arduino.h"
 
-static ArduinoMock* arduinoMock = NULL;
+static ArduinoMockBase* arduinoMock = NULL;
+
 ArduinoMock* arduinoMockInstance() {
   if(!arduinoMock) {
     arduinoMock = new ArduinoMock();
   }
-  return arduinoMock;
+  return (ArduinoMock*)arduinoMock;
 }
 void releaseArduinoMock() {
   if(arduinoMock) {
     delete arduinoMock;
     arduinoMock = NULL;
   }
+}
+
+void setArduinoMockInstance(ArduinoMockBase *mock) {
+  arduinoMock = mock;
 }
 
 void pinMode(uint8_t a, uint8_t b) {

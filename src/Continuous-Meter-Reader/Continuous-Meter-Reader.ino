@@ -9,18 +9,19 @@
 #include "settings.h"
 #include "Communicate.h"
 
-void serial_write_uint32(uint32_t val);
 
-Comparator comparator;
-Meter meter;
-Histogram histogram;
 Settings<MeterReader_Settings> settings;
 
 #define ADCPIN A7
 #define LED_PIN 13
 
 
+// analog sensor
+Comparator comparator;
+Meter meter;
+Histogram histogram;
 
+// digital sensors
 OpticalSensor digitalSensors[] = {
     OpticalSensor(8),
     OpticalSensor(7), 
@@ -29,7 +30,7 @@ OpticalSensor digitalSensors[] = {
     OpticalSensor(4), 
     OpticalSensor(3)
 };
-
+OpticalSensorCalibrator calibrator(digitalSensors);
 
 const int SAMPLE_FREQUENCY = 200; // Hz
 const int CALIBRATION_SECONDS = 5;
@@ -99,18 +100,25 @@ ISR(TIMER1_COMPA_vect)          // timer compare interrupt service routine
   int sensorValue = analogRead(ADCPIN);
 
   if(calibrationMode) {
-    if(calibrationSamples > 0) {
-      histogram.sample(sensorValue);
-      calibrationSamples--;
-    } else if(calibrationSamples == 0) {
-      int low = histogram.getPercentile(25);
-      int high = histogram.getPercentile(75);
-      int hysteresis = (high-low)/2;
-      int threshold=(high+low)/2;    
-      comparator.setHysteresis(hysteresis);
-      comparator.setThreshold(threshold);    
-      calibrationMode = false;
-      calibrationDone = true;
+    if(settings.s.samplingMode == MeterReader_Settings_SamplingMode_ANALOG) {
+      if(calibrationSamples > 0) {
+        histogram.sample(sensorValue);
+        calibrationSamples--;
+      } else if(calibrationSamples == 0) {
+        int low = histogram.getPercentile(25);
+        int high = histogram.getPercentile(75);
+        int hysteresis = (high-low)/2;
+        int threshold=(high+low)/2;    
+        comparator.setHysteresis(hysteresis);
+        comparator.setThreshold(threshold);    
+        calibrationMode = false;
+        calibrationDone = true;
+      }
+    } else {
+      if(calibrator.tick()) {
+        calibrationMode = false;
+        calibrationDone = true;
+      }
     }
   } else {
     if(settings.s.samplingMode == MeterReader_Settings_SamplingMode_ANALOG) {
@@ -152,8 +160,15 @@ void loop() {
       if(calibrationDone) {
         calibrationDone = false;
         noInterrupts();
-        settings.s.threshold = comparator.getThreshold();
-        settings.s.hysteresis = comparator.getHysteresis();
+        if(settings.s.samplingMode == MeterReader_Settings_SamplingMode_ANALOG) {
+          settings.s.threshold = comparator.getThreshold();
+          settings.s.hysteresis = comparator.getHysteresis();
+        } else {
+          for(int i=0 ; i < settings.s.fallingEdgeAmounts_count; i++) {
+            settings.s.fallingEdgeAmounts[i] = digitalSensors[i].getFallingEdgeAmount();
+            settings.s.risingEdgeAmounts[i] = digitalSensors[i].getRisingEdgeAmount();
+          }
+        }
         settings.save();
         interrupts();
         sendSettings(Serial, settings.s);
@@ -165,8 +180,12 @@ void loop() {
         case MeterReader_Message_calibrate_tag:
           noInterrupts();
           calibrationMode = true;
-          calibrationSamples=SAMPLES_TO_CALIBRATE;
-          histogram.clear();
+          if(settings.s.samplingMode == MeterReader_Settings_SamplingMode_ANALOG) {
+            calibrationSamples=SAMPLES_TO_CALIBRATE;
+            histogram.clear();
+          } else {
+            calibrator.start(settings.s.fallingEdgeAmounts_count, 1000, 1);
+          }
           interrupts();
           break;
         case MeterReader_Message_settings_tag:

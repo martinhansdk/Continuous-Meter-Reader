@@ -76,7 +76,19 @@ void loop(void);
 #define UNUSED(expr) do { (void)(expr); } while (0)
 #define F(x) (x)
 
-class ArduinoMock {
+class ArduinoMockBase {
+public:
+	virtual ~ArduinoMockBase() {};
+    virtual void pinMode(uint8_t, uint8_t) = 0;
+    virtual void analogWrite(uint8_t, int) = 0;
+    virtual void digitalWrite(uint8_t, uint8_t) = 0;
+    virtual int digitalRead(int) = 0;
+    virtual int analogRead(int) = 0;
+    virtual void delay(int) = 0;
+    virtual unsigned long millis() = 0;
+};
+
+class ArduinoMock : public ArduinoMockBase {
   public:
     MOCK_METHOD2(pinMode, void (uint8_t, uint8_t));
     MOCK_METHOD2(analogWrite, void (uint8_t, int));
@@ -88,5 +100,6 @@ class ArduinoMock {
 };
 ArduinoMock* arduinoMockInstance();
 void releaseArduinoMock();
+void setArduinoMockInstance(ArduinoMockBase *mock);
 
 #endif // ARDUINO_H
