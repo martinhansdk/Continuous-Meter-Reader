@@ -19,13 +19,14 @@ GTEST_DIR = $(GMOCK_DIR)/gtest
 ARDUINO_MOCK_DIR = ../arduino-mock
 
 # Where to find user code.
-USER_DIR = ../lib/Meter ../lib/MeterReader_pb ../lib/crc32 ../src/Continuous-Meter-Reader 
+USER_DIR = ../lib/Meter ../lib/MeterReader_pb ../lib/crc32 ../src/Continuous-Meter-Reader ../lib/RadioMessageSender 
 VPATH = $(USER_DIR) $(ARDUINO_MOCK_DIR)/src .
 
 # Test sources
 SRC_CXX_FILES = Comparator.cpp Histogram.cpp Meter.cpp Communicate.cpp
 SRC_C_FILES = pb_encode.c pb_decode.c pb_common.c MeterReader_pb.c crc32.c
-TEST_FILES = ComparatorTest.cpp HistogramTest.cpp MeterTest.cpp CommunicateTest.cpp SettingsTest.cpp OpticalSensorTest.cpp \
+TEST_FILES = ComparatorTest.cpp HistogramTest.cpp MeterTest.cpp CommunicateTest.cpp \
+             SettingsTest.cpp OpticalSensorTest.cpp RadioMessageSenderTest.cpp \
              EEPROM.cpp Stream.cpp
 ARDUINO_MOCK_FILES =  Arduino.cc
 
