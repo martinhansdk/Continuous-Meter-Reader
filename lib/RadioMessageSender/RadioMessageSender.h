@@ -22,7 +22,6 @@ This makes it possible for the receiver to determine
 #define RADIOMESSAGE_SENDER_H
 
 #include "RF24.h"
-#include <iostream>
 
 static int HEADER_SIZE = sizeof(uint64_t);
 
