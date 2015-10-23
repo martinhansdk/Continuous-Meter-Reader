@@ -41,7 +41,7 @@ MONITOR_BAUDRATE  = 115200
 ### Path to the AVR tools directory such as avr-gcc, avr-g++, etc.
 AVR_TOOLS_DIR     = /usr
 
-ARDUINO_LIBS = EEPROM
+ARDUINO_LIBS = EEPROM SPI 
 
 ### AVRDDUDE
 ### Path to avrdude directory.

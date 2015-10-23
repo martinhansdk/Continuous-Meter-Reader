@@ -84,15 +84,42 @@ namespace testing {
                 ASSERT_FALSE(receiver.available());
             }
         }
-    };
+    }; 
 
-    TEST_F(RadioMessageTest, doesNotTransmitEmptyMessage) {
-        testMessageTransmission(sender1, radio1, "");
+    TEST_F(RadioMessageTest, transmitsEmptyMessage) {
+        sender1.startMessage();
+        sender1.write((const uint8_t*)"", 0, true);
+        EXPECT_EQ(1u, radio1.chunks.size());
+        EXPECT_EQ("", radio1.combinedMessage);
+        EXPECT_EQ(0u, radio1.combinedMessage.length());
     }
 
 
     TEST_F(RadioMessageTest, transmitsShortMessage) {
         testMessageTransmission(sender1, radio1, "x");
+    }
+ 
+    TEST_F(RadioMessageTest, allowsEmptyLastChunk) {
+        sender1.startMessage();
+        sender1.write((const uint8_t*)"banana", 6, false);
+        sender1.write((const uint8_t*)"s", 1, false);
+        sender1.write((const uint8_t*)"", 0, true);
+
+        EXPECT_EQ(1u, radio1.chunks.size());
+        EXPECT_EQ("bananas", radio1.combinedMessage);
+        EXPECT_EQ(7u, radio1.combinedMessage.length());
+    }
+
+    TEST_F(RadioMessageTest, sendsOddSizeChunks) {
+        sender1.startMessage();
+        sender1.write((const uint8_t*)string(10, 'a').c_str(), 10, false);
+        sender1.write((const uint8_t*)string(10, 'a').c_str(), 10, false);
+        sender1.write((const uint8_t*)string(10, 'a').c_str(), 10, false);
+        sender1.write((const uint8_t*)string(10, 'a').c_str(), 10, true);
+
+        EXPECT_EQ(2u, radio1.chunks.size());
+        EXPECT_EQ(string(40, 'a'), radio1.combinedMessage);
+        EXPECT_EQ(40u, radio1.combinedMessage.length());
     }
 
 	TEST_F(RadioMessageTest, transmitsLongMessage) {
@@ -144,7 +171,7 @@ namespace testing {
             ASSERT_FALSE(receiver1.available());
         }
         checkMessageReceived(receiver1, textB);
-    }
+    } 
 
     TEST_F(RadioMessageTest, handlesRepeatedChunks) {
         string textA = string("A", 255);

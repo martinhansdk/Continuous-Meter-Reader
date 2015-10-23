@@ -67,14 +67,14 @@ void RadioMessageSender::writeHeader(bool last) {
 }
 
 bool RadioMessageSender::write(const uint8_t *data, uint8_t len, bool lastWriteInMessage) {
-	while(len > 0) {
+	while(len > 0 || lastWriteInMessage) {
 		size_t maxLen = min((unsigned long)len, sizeof(buffer) - bytesInBuffer);
 		memcpy(&buffer[bytesInBuffer], data, maxLen);
 		bytesInBuffer += maxLen;
 		len -= maxLen;
 		data += maxLen;
 
-		if(bytesInBuffer == sizeof(buffer) || len == 0) {
+		if(bytesInBuffer == sizeof(buffer) || (len == 0 && lastWriteInMessage)) {
 			bool lastChunk = lastWriteInMessage && len == 0;
 			writeHeader(lastChunk);
 			bool ok = radio.write(buffer, bytesInBuffer);
@@ -82,6 +82,9 @@ bool RadioMessageSender::write(const uint8_t *data, uint8_t len, bool lastWriteI
 				return false;
 
 			bytesInBuffer = HEADER_SIZE;
+
+			if(lastWriteInMessage && len == 0)
+				break;
 		}
 	}
 	return true;
