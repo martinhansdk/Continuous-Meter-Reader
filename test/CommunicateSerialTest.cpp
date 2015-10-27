@@ -1,12 +1,12 @@
 #include <vector>
 #include "gtest/gtest.h"
-#include "Communicate.h"
+#include "CommunicateSerial.h"
 #include "MeterReader_pb.h"
 
 
 namespace testing {
 
-    class CommunicateTest : public ::testing::Test {
+    class CommunicateSerialTest : public ::testing::Test {
     protected:
         TestStream stream;
 
@@ -17,7 +17,7 @@ namespace testing {
         }
     };
 
-    TEST_F(CommunicateTest, canSendAndReceiveUpdate) {
+    TEST_F(CommunicateSerialTest, canSendAndReceiveUpdate) {
         const int32_t METER_ID = 1234567;
         const uint32_t SERIES_ID = 390123456;
         const uint64_t CURRENT_VALUE = 917253829100362;
@@ -56,7 +56,7 @@ namespace testing {
         EXPECT_EQ(0u, (size_t)stream.available());
       }
 
-    TEST_F(CommunicateTest, canSendAndReceiveSettings) {
+    TEST_F(CommunicateSerialTest, canSendAndReceiveSettings) {
         MeterReader_Settings settings;
 
         Receiver<MeterReader_Message, MeterReader_Message_fields> receiver(stream);
@@ -80,7 +80,7 @@ namespace testing {
         EXPECT_EQ(0u, (size_t)stream.available());
       }
 
-    TEST_F(CommunicateTest, discardsWrongCRC) {
+    TEST_F(CommunicateSerialTest, discardsWrongCRC) {
         Receiver<MeterReader_Message, MeterReader_Message_fields> receiver(stream);
 
         sendCounterUpdate(stream, 0, 0, 0);

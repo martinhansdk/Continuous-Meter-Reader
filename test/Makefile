@@ -19,15 +19,15 @@ GTEST_DIR = $(GMOCK_DIR)/gtest
 ARDUINO_MOCK_DIR = ../arduino-mock
 
 # Where to find user code.
-USER_DIR = ../lib/Meter ../lib/MeterReader_pb ../lib/crc32 ../src/Continuous-Meter-Reader ../lib/RadioMessageSender 
+USER_DIR = ../lib/Meter ../lib/MeterReader_pb ../lib/crc32 ../src/Continuous-Meter-Reader ../lib/RadioMessageSender ../lib/RadioMessageReceiver ../lib/CommunicateSerial ../lib/CommunicateWireless 
 VPATH = $(USER_DIR) $(ARDUINO_MOCK_DIR)/src .
 
 # Test sources
-SRC_CXX_FILES = Comparator.cpp Histogram.cpp Meter.cpp Communicate.cpp
+SRC_CXX_FILES = Comparator.cpp Histogram.cpp Meter.cpp CommunicateSerial.cpp RadioMessageSender.cpp CommunicateWireless.cpp
 SRC_C_FILES = pb_encode.c pb_decode.c pb_common.c MeterReader_pb.c crc32.c
-TEST_FILES = ComparatorTest.cpp HistogramTest.cpp MeterTest.cpp CommunicateTest.cpp \
-             SettingsTest.cpp OpticalSensorTest.cpp RadioMessageTest.cpp \
-             EEPROM.cpp Stream.cpp
+TEST_FILES = ComparatorTest.cpp HistogramTest.cpp MeterTest.cpp CommunicateSerialTest.cpp \
+             SettingsTest.cpp OpticalSensorTest.cpp RadioMessageTest.cpp CommunicateWirelessTest.cpp \
+             EEPROM.cpp Stream.cpp RF24.cpp
 ARDUINO_MOCK_FILES =  Arduino.cc
 
 OBJS = $(SRC_CXX_FILES:.cpp=.o) $(SRC_C_FILES:.c=.o) $(ARDUINO_MOCK_FILES:.cc=.o) $(TEST_FILES:.cpp=.o)

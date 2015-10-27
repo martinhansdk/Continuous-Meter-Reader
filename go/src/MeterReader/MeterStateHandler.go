@@ -6,7 +6,7 @@ import (
 )
 
 type Meter struct {
-	MeterId       int32
+	MeterId       uint32
 	Name          string
 	Unit          string
 	CurrentSeries uint32
@@ -15,7 +15,7 @@ type Meter struct {
 }
 
 type MeterUpdate struct {
-	MeterId    int32     `json:"meter"`
+	MeterId    uint32    `json:"meter"`
 	MeasuredAt time.Time `json:"measured_at"`
 	Unit       string    `json:"unit"`
 	Name       string    `json:"name"`
@@ -24,7 +24,7 @@ type MeterUpdate struct {
 
 type MeterStateHandler struct {
 	mdb    *MeterDB
-	meters map[int32]*Meter
+	meters map[uint32]*Meter
 }
 
 func NewMeterStateHandler() *MeterStateHandler {

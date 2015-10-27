@@ -222,7 +222,7 @@ func (m *LogMessage) GetText() string {
 }
 
 type CounterUpdate struct {
-	MeterId             *int32  `protobuf:"varint,1,req,name=meterId" json:"meterId,omitempty"`
+	MeterId             *uint32 `protobuf:"varint,1,req,name=meterId" json:"meterId,omitempty"`
 	SeriesId            *uint32 `protobuf:"varint,2,req,name=seriesId" json:"seriesId,omitempty"`
 	CurrentCounterValue *uint64 `protobuf:"varint,3,req,name=currentCounterValue" json:"currentCounterValue,omitempty"`
 	XXX_unrecognized    []byte  `json:"-"`
@@ -232,7 +232,7 @@ func (m *CounterUpdate) Reset()         { *m = CounterUpdate{} }
 func (m *CounterUpdate) String() string { return proto.CompactTextString(m) }
 func (*CounterUpdate) ProtoMessage()    {}
 
-func (m *CounterUpdate) GetMeterId() int32 {
+func (m *CounterUpdate) GetMeterId() uint32 {
 	if m != nil && m.MeterId != nil {
 		return *m.MeterId
 	}
@@ -264,7 +264,7 @@ func (*StartCalibration) ProtoMessage()    {}
 // Example settings structure
 type Settings struct {
 	// The variables of our settings
-	MeterId              *int32                         `protobuf:"varint,1,req,name=meterId" json:"meterId,omitempty"`
+	MeterId              *uint32                        `protobuf:"varint,1,req,name=meterId" json:"meterId,omitempty"`
 	SeriesId             *uint32                        `protobuf:"varint,2,req,name=seriesId" json:"seriesId,omitempty"`
 	SendProtocol         *Settings_SendProtocol         `protobuf:"varint,3,req,name=sendProtocol,enum=MeterReader.Settings_SendProtocol" json:"sendProtocol,omitempty"`
 	CommunicationChannel *Settings_CommunicationChannel `protobuf:"varint,4,req,name=communicationChannel,enum=MeterReader.Settings_CommunicationChannel" json:"communicationChannel,omitempty"`
@@ -282,7 +282,7 @@ func (m *Settings) Reset()         { *m = Settings{} }
 func (m *Settings) String() string { return proto.CompactTextString(m) }
 func (*Settings) ProtoMessage()    {}
 
-func (m *Settings) GetMeterId() int32 {
+func (m *Settings) GetMeterId() uint32 {
 	if m != nil && m.MeterId != nil {
 		return *m.MeterId
 	}

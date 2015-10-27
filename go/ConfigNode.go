@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/tarm/serial"
 	"log"
+	"math"
 	"strconv"
 	"time"
 )
@@ -36,10 +37,12 @@ func (i *edgeAmounts) Set(value string) error {
 
 func main() {
 	var serialport = flag.String("serial", "/dev/ttyUSB0", "The serial port to use to connect")
-	var id = flag.Int("id", -1, "Set the meter id")
+	var id = flag.Uint("id", math.MaxUint32, "Set the meter id")
 	var seriesId = flag.Uint("series", 0, "Set the series id")
 	var calibrate = flag.Bool("calibrate", false, "Start calibration")
 	var analog = flag.Bool("analog", false, "Set sampling mode to analog")
+	var serialProtocol = flag.Bool("serialproto", false, "Use serial communication to transfer updates")
+	var wirelessProtocol = flag.Bool("wirelessproto", false, "Use wireless to transfer updates")
 	var digital = flag.Bool("digital", false, "Set sampling mode to digital")
 	var risingEdgeAmounts edgeAmounts
 	var fallingEdgeAmounts edgeAmounts
@@ -86,9 +89,9 @@ func main() {
 		MeterReader.SendStartCalibration(ser)
 	}
 
-	if *id != -1 {
+	if *id != math.MaxUint32 {
 		changedSettings = true
-		var _id = int32(*id)
+		var _id = uint32(*id)
 		settings.MeterId = &_id
 	}
 
@@ -125,6 +128,21 @@ func main() {
 			mode = MeterReader.Settings_ANALOG
 		}
 		settings.SamplingMode = &mode
+		changedSettings = true
+	}
+
+	if *serialProtocol || *wirelessProtocol {
+		if *serialProtocol && *wirelessProtocol {
+			log.Fatal("Can't use both serial and wireless communication protocol.")
+		}
+
+		var mode MeterReader.Settings_CommunicationChannel
+		if *serialProtocol {
+			mode = MeterReader.Settings_SERIAL
+		} else {
+			mode = MeterReader.Settings_WIRELESS
+		}
+		settings.CommunicationChannel = &mode
 		changedSettings = true
 	}
 

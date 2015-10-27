@@ -46,18 +46,25 @@ namespace testing {
         RadioMessageSender sender1, sender1_2, sender2, sender3, sender4;
         RadioMessageReceiver<2, 255> receiver1, receiver5;
 
-        RadioMessageTest() : sender1(METER_ID_1, SEQUENCE_1, radio1), 
-                             sender1_2(METER_ID_1_2, SEQUENCE_1_2, radio1), 
-                             sender2(METER_ID_2, SEQUENCE_2, radio1), 
-                             sender3(METER_ID_3, SEQUENCE_3, radio1), 
-                             sender4(METER_ID_4, SEQUENCE_4, radio4), 
+        RadioMessageTest() : sender1(radio1), 
+                             sender1_2(radio1), 
+                             sender2(radio1), 
+                             sender3(radio1), 
+                             sender4(radio4), 
                              receiver1(radio1),
-                             receiver5(radio5) {};
+                             receiver5(radio5) {
+            sender1.begin(METER_ID_1, SEQUENCE_1);
+            sender1_2.begin(METER_ID_1_2, SEQUENCE_1_2);
+            sender2.begin(METER_ID_2, SEQUENCE_2);
+            sender3.begin(METER_ID_3, SEQUENCE_3);
+            sender4.begin(METER_ID_4, SEQUENCE_4);
+
+        };
 
         void testMessageTransmission(RadioMessageSender &sender, RF24 &radio, string message) {
             transmit(sender, message);
 
-            EXPECT_EQ(ceil((float)(message.length()) / (float)(32 - HEADER_SIZE)), radio.chunks.size());
+            EXPECT_EQ(ceil((float)(message.length()) / (float)(32 - RADIO_HEADER_SIZE)), radio.chunks.size());
             EXPECT_EQ(message, radio.combinedMessage);
             EXPECT_EQ(message.length(), radio.combinedMessage.length());
         }
@@ -70,7 +77,7 @@ namespace testing {
         template <typename T>
         void checkMessageReceived(T &receiver, string text) {
             ASSERT_TRUE(receiver.available());
-            const uint8_t *data;
+            uint8_t *data;
             const MessageHeader *header;
             uint16_t bytes = receiver.read(data, header);
 

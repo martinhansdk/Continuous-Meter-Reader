@@ -42,11 +42,11 @@ func NewMeterDB() *MeterDB {
 	return mdb
 }
 
-func (mdb *MeterDB) GetMeterState() map[int32]*Meter {
-	meters := make(map[int32]*Meter)
+func (mdb *MeterDB) GetMeterState() map[uint32]*Meter {
+	meters := make(map[uint32]*Meter)
 
 	var (
-		id             int32
+		id             uint32
 		name           string
 		unit           string
 		current_series uint32

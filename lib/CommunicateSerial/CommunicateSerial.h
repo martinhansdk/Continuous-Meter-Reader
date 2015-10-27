@@ -1,5 +1,5 @@
-#ifndef _COMMUNICATE_H
-#define _COMMUNICATE_H
+#ifndef _COMMUNICATE_SERIAL_H
+#define _COMMUNICATE_SERIAL_H
 
 #include <Stream.h>
 #include <MeterReader_pb.h>
@@ -14,6 +14,7 @@
 #include <endian.h>
 #endif
 
+void sendMessage(Stream &s, MeterReader_Message &message);
 void sendCounterUpdate(Stream &s, int32_t meterId, uint32_t seriesId, uint64_t currentValue);
 void sendSettings(Stream &s, MeterReader_Settings &settings);
 void sendLog(Stream &s, MeterReader_LogMessage_Type type, const char* text);

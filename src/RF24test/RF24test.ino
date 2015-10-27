@@ -10,19 +10,22 @@
 
 /****************** User Config ***************************/
 /***      Set this radio as radio number 0 or 1         ***/
-bool radioNumber = 1;
+bool radioNumber = 0;
 
 /* Hardware configuration: Set up nRF24L01 radio on SPI bus plus pins 7 & 8 */
 RF24 radio(9,10);
 /**********************************************************/
 
-byte addresses[][6] = {"1Node","2Node"};
+const char* addresses[] = {"meterS","meterR"};
 
 // Used to control whether this node is sending or receiving
 bool role = 0;
 
+// 0 = receiver
+// 1 = sender
+
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(57600);
   Serial.println(F("RF24/examples/GettingStarted"));
   Serial.println(F("*** PRESS 'T' to begin transmitting to the other node"));
   
@@ -34,11 +37,13 @@ void setup() {
   
   // Open a writing and reading pipe on each radio, with opposite addresses
   if(radioNumber){
-    radio.openWritingPipe(addresses[1]);
-    radio.openReadingPipe(1,addresses[0]);
+    // sender
+    radio.openWritingPipe((const uint8_t*)addresses[1]);
+    radio.openReadingPipe(1,(const uint8_t*)addresses[0]);
   }else{
-    radio.openWritingPipe(addresses[0]);
-    radio.openReadingPipe(1,addresses[1]);
+    // receiver
+    radio.openWritingPipe((const uint8_t*)addresses[0]);
+    radio.openReadingPipe(1,(const uint8_t*)addresses[1]);
   }
   
   // Start the radio listening for data

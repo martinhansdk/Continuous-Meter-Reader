@@ -3,6 +3,14 @@
 
 #include <RF24.h>
 
+#ifdef __AVR__
+// avr does not have endian.h and is already little endian
+#define htole64(val) val
+#define le64toh(val) val
+#else
+#include <endian.h>
+#endif
+
 typedef uint64_t header_t;
 
 struct MessageHeader {
@@ -145,7 +153,7 @@ public:
 	If the data is needed longer, it must be copied.
 
 	*/
-	uint16_t read(const uint8_t *&buf, const MessageHeader *&header) {
+	uint16_t read(uint8_t *&buf, const MessageHeader *&header) {
 		int i = findCompleteMessageSlot();
 		if(i == -1) {
 			return 0;

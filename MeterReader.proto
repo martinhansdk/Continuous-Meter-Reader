@@ -20,7 +20,7 @@ message LogMessage {
 }
 
 message CounterUpdate {
-  required int32 meterId = 1;
+  required uint32 meterId = 1;
 	required uint32 seriesId = 2;
 	required uint64 currentCounterValue = 3;
 }
@@ -31,7 +31,7 @@ message StartCalibration {
 // Example settings structure
 message Settings {
   // The variables of our settings
-  required int32 meterId = 1;
+  required uint32 meterId = 1;
   required uint32 seriesId = 2;
 
   // Modes

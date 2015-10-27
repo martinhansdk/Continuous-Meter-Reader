@@ -1,20 +1,30 @@
 //-*-c++-*-
 /* Meter reader */
 
+#include <SPI.h>
 #include "Histogram.h"
 #include "Meter.h"
 #include "Comparator.h"
 #include "MeterReader_pb.h"
 #include "OpticalSensor.h"
 #include "settings.h"
-#include "Communicate.h"
-
+#include "CommunicateSerial.h"
+#include "CommunicateWireless.h"
+#include "RadioMessageSender.h"
+#include "crc32.h"
 
 Settings<MeterReader_Settings> settings;
 
 #define ADCPIN A7
-#define LED_PIN 13
 
+// Hardware configuration: Set up nRF24L01 radio on SPI bus plus pins 9 & 10
+RF24 radio(9,10);
+RadioMessageSender radioSender(radio);
+
+const char* addresses[] = {"meterS","meterR"};
+
+//uint64_t baseAddress = 286093099LL; 
+uint64_t myAddress; 
 
 // analog sensor
 Comparator comparator;
@@ -36,7 +46,7 @@ const int SAMPLE_FREQUENCY = 200; // Hz
 const int CALIBRATION_SECONDS = 5;
 const int SAMPLE_TIME = 1000 / SAMPLE_FREQUENCY; // ms
 const int SAMPLES_TO_CALIBRATE = CALIBRATION_SECONDS*1000/SAMPLE_TIME;
-const int TICKS_BETWEEN_SEND = 40; // 0.2 seconds
+const int TICKS_BETWEEN_SEND = 200; // 1 second
 
 int calibrationSamples=SAMPLES_TO_CALIBRATE;
 bool calibrationMode, calibrationDone;
@@ -52,10 +62,24 @@ void setup() {
   calibrationMode = false;
   calibrationDone = false;
 
+ 
   // pick the next series
   settings.load();
   settings.s.seriesId += 1;
   settings.save();
+
+  radio.begin();
+  radio.setPALevel(RF24_PA_MAX);
+
+  //myAddress = baseAddress + settings.s.meterId;
+  //radio.openWritingPipe(address);
+  radio.openWritingPipe((const uint8_t*)addresses[1]);
+  radio.openReadingPipe(1,(const uint8_t*)addresses[0]);
+  radio.enableDynamicPayloads();
+  radio.stopListening();
+
+  radioSender.begin(settings.s.meterId, settings.s.seriesId);
+  
 
   // sanitize the number of digital sensors
   if(settings.s.fallingEdgeAmounts_count > 6) {
@@ -152,8 +176,16 @@ void loop() {
       interrupts();
       // protected access to variables shared with ISR END
 
-      if(currentValue != lastSentValue) {
-        sendCounterUpdate(Serial, settings.s.meterId, settings.s.seriesId, currentValue);
+      if(true || currentValue != lastSentValue) {
+        //if(settings.s.communicationChannel == MeterReader_Settings_CommunicationChannel_WIRELESS) {
+        //unsigned long time = micros();                             // Take the time, and send it.  This will block until complete
+        //if (!radio.write( &time, sizeof(unsigned long) )){
+        //  Serial.println(F("failed"));
+        //}
+        sendCounterUpdateByRadio(radioSender, settings.s.meterId, settings.s.seriesId, currentValue);
+        //} else {
+        //sendCounterUpdate(Serial, settings.s.meterId, settings.s.seriesId, currentValue);
+        //}
         lastSentValue = currentValue;
       }
 
