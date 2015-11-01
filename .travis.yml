@@ -2,7 +2,7 @@ language: cpp
 compiler:
   - gcc
 before_install:
- - sudo add-apt-get install golang protobuf-compiler arduino
+ - sudo apt-get install protobuf-compiler arduino
 script:
  - pushd test && make && popd
  - pushd src/Continuous-Meter-Reader && make && popd
