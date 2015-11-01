@@ -1,24 +1,24 @@
 #include "Comparator.h"
 
-Comparator::Comparator() : 
-  threshold(MID_SAMPLE_VALUE), 
-  hysteresis(MAX_SAMPLE_VALUE/10),
+Comparator::Comparator() :
+  threshold(MID_SAMPLE_VALUE),
+  hysteresis(MAX_SAMPLE_VALUE / 10),
   state(0),
   noOfListeners(0) {
 }
 
 void Comparator::notifyListeners() {
-  for(unsigned int i=0 ; i < noOfListeners ; i++) {
+  for(unsigned int i = 0 ; i < noOfListeners ; i++) {
     listeners[i]->increment();
   }
 }
 
 void Comparator::sample(sample_t value) {
-  if(state==0 && value > threshold+hysteresis) {
-    state=1;
+  if(state == 0 && value > threshold + hysteresis) {
+    state = 1;
     notifyListeners();
-  } else if(state==1 && value < threshold-hysteresis) {
-    state=0;
+  } else if(state == 1 && value < threshold - hysteresis) {
+    state = 0;
   }
 }
 

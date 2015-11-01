@@ -1,6 +1,6 @@
 /**
 The Meter class implements a counter which keeps track
-of how many real life quantities (meters, kWh, etc) have 
+of how many real life quantities (meters, kWh, etc) have
 been measured so far.
 
 */
@@ -12,12 +12,12 @@ been measured so far.
 #include "UnitIncrementListener.h"
 
 class Meter : public UnitIncrementListener {
-  uint64_t count;
-public:
-  Meter();
-  virtual void increment();
-  virtual void add(uint64_t amount);
-  uint64_t getCurrentValue();
+    uint64_t count;
+  public:
+    Meter();
+    virtual void increment();
+    virtual void add(uint64_t amount);
+    uint64_t getCurrentValue();
 };
 
 #endif

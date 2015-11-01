@@ -1,5 +1,5 @@
 
-/** Sends a message over a RF24 link. 
+/** Sends a message over a RF24 link.
 The message may be larger than the maximum payload size of 32 bytes and will then be split into several chunks.
 
 Every chunk is prepended with a header containing
@@ -27,22 +27,22 @@ This makes it possible for the receiver to determine
 static int RADIO_HEADER_SIZE = sizeof(uint64_t);
 
 class RadioMessageSender {
-	uint8_t buffer[32];
-	uint8_t bytesInBuffer;
-	uint32_t id;
-	uint16_t sequence;
-	uint32_t messageNumber;
-	uint8_t chunkNumber;
-	RF24& radio;
+    uint8_t buffer[32];
+    uint8_t bytesInBuffer;
+    uint32_t id;
+    uint16_t sequence;
+    uint32_t messageNumber;
+    uint8_t chunkNumber;
+    RF24& radio;
 
-public:
+  public:
     RadioMessageSender(RF24 &radio) : radio(radio) {};
     void begin(uint32_t myId, uint16_t _sequence);
     void startMessage();
     bool write(const uint8_t *data, uint8_t len, bool lastWriteInMessage);
 
-private:
-	void writeHeader(bool last);
+  private:
+    void writeHeader(bool last);
 };
 
 

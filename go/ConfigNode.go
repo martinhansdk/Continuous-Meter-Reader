@@ -40,10 +40,8 @@ func main() {
 	var id = flag.Uint("id", math.MaxUint32, "Set the meter id")
 	var seriesId = flag.Uint("series", 0, "Set the series id")
 	var calibrate = flag.Bool("calibrate", false, "Start calibration")
-	var analog = flag.Bool("analog", false, "Set sampling mode to analog")
 	var serialProtocol = flag.Bool("serialproto", false, "Use serial communication to transfer updates")
 	var wirelessProtocol = flag.Bool("wirelessproto", false, "Use wireless to transfer updates")
-	var digital = flag.Bool("digital", false, "Set sampling mode to digital")
 	var risingEdgeAmounts edgeAmounts
 	var fallingEdgeAmounts edgeAmounts
 	flag.Var(&risingEdgeAmounts, "rising", "Rising edge amount")
@@ -113,21 +111,6 @@ func main() {
 		settings.FallingEdgeAmounts = fallingEdgeAmounts.amounts
 		settings.RisingEdgeAmounts = risingEdgeAmounts.amounts
 
-		changedSettings = true
-	}
-
-	if *digital || *analog {
-		if *digital && *analog {
-			log.Fatal("Can't set to both digital and analog sampling mode.")
-		}
-
-		var mode MeterReader.Settings_SamplingMode
-		if *digital {
-			mode = MeterReader.Settings_DIGITAL
-		} else {
-			mode = MeterReader.Settings_ANALOG
-		}
-		settings.SamplingMode = &mode
 		changedSettings = true
 	}
 

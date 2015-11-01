@@ -16,7 +16,7 @@ void Meter::increment() {
 }
 
 void Meter::add(uint64_t amount) {
-  count+=amount;
+  count += amount;
 }
 
 uint64_t Meter::getCurrentValue() {

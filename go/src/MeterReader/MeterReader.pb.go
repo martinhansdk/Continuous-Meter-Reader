@@ -58,39 +58,6 @@ func (x *LogMessage_Type) UnmarshalJSON(data []byte) error {
 }
 
 // Modes
-type Settings_SendProtocol int32
-
-const (
-	Settings_ASCII    Settings_SendProtocol = 0
-	Settings_PROTOBUF Settings_SendProtocol = 1
-)
-
-var Settings_SendProtocol_name = map[int32]string{
-	0: "ASCII",
-	1: "PROTOBUF",
-}
-var Settings_SendProtocol_value = map[string]int32{
-	"ASCII":    0,
-	"PROTOBUF": 1,
-}
-
-func (x Settings_SendProtocol) Enum() *Settings_SendProtocol {
-	p := new(Settings_SendProtocol)
-	*p = x
-	return p
-}
-func (x Settings_SendProtocol) String() string {
-	return proto.EnumName(Settings_SendProtocol_name, int32(x))
-}
-func (x *Settings_SendProtocol) UnmarshalJSON(data []byte) error {
-	value, err := proto.UnmarshalJSONEnum(Settings_SendProtocol_value, data, "Settings_SendProtocol")
-	if err != nil {
-		return err
-	}
-	*x = Settings_SendProtocol(value)
-	return nil
-}
-
 type Settings_CommunicationChannel int32
 
 const (
@@ -121,39 +88,6 @@ func (x *Settings_CommunicationChannel) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	*x = Settings_CommunicationChannel(value)
-	return nil
-}
-
-type Settings_SamplingMode int32
-
-const (
-	Settings_ANALOG  Settings_SamplingMode = 0
-	Settings_DIGITAL Settings_SamplingMode = 1
-)
-
-var Settings_SamplingMode_name = map[int32]string{
-	0: "ANALOG",
-	1: "DIGITAL",
-}
-var Settings_SamplingMode_value = map[string]int32{
-	"ANALOG":  0,
-	"DIGITAL": 1,
-}
-
-func (x Settings_SamplingMode) Enum() *Settings_SamplingMode {
-	p := new(Settings_SamplingMode)
-	*p = x
-	return p
-}
-func (x Settings_SamplingMode) String() string {
-	return proto.EnumName(Settings_SamplingMode_name, int32(x))
-}
-func (x *Settings_SamplingMode) UnmarshalJSON(data []byte) error {
-	value, err := proto.UnmarshalJSONEnum(Settings_SamplingMode_value, data, "Settings_SamplingMode")
-	if err != nil {
-		return err
-	}
-	*x = Settings_SamplingMode(value)
 	return nil
 }
 
@@ -266,12 +200,10 @@ type Settings struct {
 	// The variables of our settings
 	MeterId              *uint32                        `protobuf:"varint,1,req,name=meterId" json:"meterId,omitempty"`
 	SeriesId             *uint32                        `protobuf:"varint,2,req,name=seriesId" json:"seriesId,omitempty"`
-	SendProtocol         *Settings_SendProtocol         `protobuf:"varint,3,req,name=sendProtocol,enum=MeterReader.Settings_SendProtocol" json:"sendProtocol,omitempty"`
 	CommunicationChannel *Settings_CommunicationChannel `protobuf:"varint,4,req,name=communicationChannel,enum=MeterReader.Settings_CommunicationChannel" json:"communicationChannel,omitempty"`
-	SamplingMode         *Settings_SamplingMode         `protobuf:"varint,5,req,name=samplingMode,enum=MeterReader.Settings_SamplingMode" json:"samplingMode,omitempty"`
 	// Analog sampling: comparator settings
-	Threshold  *uint32 `protobuf:"varint,6,req,name=threshold" json:"threshold,omitempty"`
-	Hysteresis *uint32 `protobuf:"varint,7,req,name=hysteresis" json:"hysteresis,omitempty"`
+	Threshold  *uint32 `protobuf:"varint,5,req,name=threshold" json:"threshold,omitempty"`
+	Hysteresis *uint32 `protobuf:"varint,6,req,name=hysteresis" json:"hysteresis,omitempty"`
 	// Digital sampling: edge amounts
 	RisingEdgeAmounts  []uint32 `protobuf:"varint,8,rep,name=risingEdgeAmounts" json:"risingEdgeAmounts,omitempty"`
 	FallingEdgeAmounts []uint32 `protobuf:"varint,9,rep,name=fallingEdgeAmounts" json:"fallingEdgeAmounts,omitempty"`
@@ -296,25 +228,11 @@ func (m *Settings) GetSeriesId() uint32 {
 	return 0
 }
 
-func (m *Settings) GetSendProtocol() Settings_SendProtocol {
-	if m != nil && m.SendProtocol != nil {
-		return *m.SendProtocol
-	}
-	return Settings_ASCII
-}
-
 func (m *Settings) GetCommunicationChannel() Settings_CommunicationChannel {
 	if m != nil && m.CommunicationChannel != nil {
 		return *m.CommunicationChannel
 	}
 	return Settings_SERIAL
-}
-
-func (m *Settings) GetSamplingMode() Settings_SamplingMode {
-	if m != nil && m.SamplingMode != nil {
-		return *m.SamplingMode
-	}
-	return Settings_ANALOG
 }
 
 func (m *Settings) GetThreshold() uint32 {
@@ -347,7 +265,5 @@ func (m *Settings) GetFallingEdgeAmounts() []uint32 {
 
 func init() {
 	proto.RegisterEnum("MeterReader.LogMessage_Type", LogMessage_Type_name, LogMessage_Type_value)
-	proto.RegisterEnum("MeterReader.Settings_SendProtocol", Settings_SendProtocol_name, Settings_SendProtocol_value)
 	proto.RegisterEnum("MeterReader.Settings_CommunicationChannel", Settings_CommunicationChannel_name, Settings_CommunicationChannel_value)
-	proto.RegisterEnum("MeterReader.Settings_SamplingMode", Settings_SamplingMode_name, Settings_SamplingMode_value)
 }

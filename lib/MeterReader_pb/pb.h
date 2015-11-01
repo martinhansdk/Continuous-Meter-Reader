@@ -80,27 +80,27 @@
  * This just reduces memory requirements, but is not required.
  */
 #if defined(PB_NO_PACKED_STRUCTS)
-    /* Disable struct packing */
+/* Disable struct packing */
 #   define PB_PACKED_STRUCT_START
 #   define PB_PACKED_STRUCT_END
 #   define pb_packed
 #elif defined(__GNUC__) || defined(__clang__)
-    /* For GCC and clang */
+/* For GCC and clang */
 #   define PB_PACKED_STRUCT_START
 #   define PB_PACKED_STRUCT_END
 #   define pb_packed __attribute__((packed))
 #elif defined(__ICCARM__) || defined(__CC_ARM)
-    /* For IAR ARM and Keil MDK-ARM compilers */
+/* For IAR ARM and Keil MDK-ARM compilers */
 #   define PB_PACKED_STRUCT_START _Pragma("pack(push, 1)")
 #   define PB_PACKED_STRUCT_END _Pragma("pack(pop)")
 #   define pb_packed
 #elif defined(_MSC_VER) && (_MSC_VER >= 1500)
-    /* For Microsoft Visual C++ */
+/* For Microsoft Visual C++ */
 #   define PB_PACKED_STRUCT_START __pragma(pack(push, 1))
 #   define PB_PACKED_STRUCT_END __pragma(pack(pop))
 #   define pb_packed
 #else
-    /* Unknown compiler */
+/* Unknown compiler */
 #   define PB_PACKED_STRUCT_START
 #   define PB_PACKED_STRUCT_END
 #   define pb_packed
@@ -187,7 +187,7 @@ typedef uint8_t pb_type_t;
 #define PB_HTYPE_MASK     0x30
 
 /**** Field allocation types ****/
- 
+
 #define PB_ATYPE_STATIC   0x00
 #define PB_ATYPE_POINTER  0x80
 #define PB_ATYPE_CALLBACK 0x40
@@ -202,16 +202,16 @@ typedef uint8_t pb_type_t;
  */
 #if defined(PB_FIELD_32BIT)
 #define PB_SIZE_MAX ((uint32_t)-1)
-    typedef uint32_t pb_size_t;
-    typedef int32_t pb_ssize_t;
+typedef uint32_t pb_size_t;
+typedef int32_t pb_ssize_t;
 #elif defined(PB_FIELD_16BIT)
 #define PB_SIZE_MAX ((uint16_t)-1)
-    typedef uint16_t pb_size_t;
-    typedef int16_t pb_ssize_t;
+typedef uint16_t pb_size_t;
+typedef int16_t pb_ssize_t;
 #else
 #define PB_SIZE_MAX ((uint8_t)-1)
-    typedef uint8_t pb_size_t;
-    typedef int8_t pb_ssize_t;
+typedef uint8_t pb_size_t;
+typedef int8_t pb_ssize_t;
 #endif
 
 /* This structure is used in auto-generated constants
@@ -225,17 +225,17 @@ typedef uint8_t pb_type_t;
 PB_PACKED_STRUCT_START
 typedef struct pb_field_s pb_field_t;
 struct pb_field_s {
-    pb_size_t tag;
-    pb_type_t type;
-    pb_size_t data_offset; /* Offset of field data, relative to previous field. */
-    pb_ssize_t size_offset; /* Offset of array size or has-boolean, relative to data */
-    pb_size_t data_size; /* Data size in bytes for a single item */
-    pb_size_t array_size; /* Maximum number of entries in array */
-    
-    /* Field definitions for submessage
-     * OR default value for all other non-array, non-callback types
-     * If null, then field will zeroed. */
-    const void *ptr;
+  pb_size_t tag;
+  pb_type_t type;
+  pb_size_t data_offset; /* Offset of field data, relative to previous field. */
+  pb_ssize_t size_offset; /* Offset of array size or has-boolean, relative to data */
+  pb_size_t data_size; /* Data size in bytes for a single item */
+  pb_size_t array_size; /* Maximum number of entries in array */
+
+  /* Field definitions for submessage
+   * OR default value for all other non-array, non-callback types
+   * If null, then field will zeroed. */
+  const void *ptr;
 } pb_packed;
 PB_PACKED_STRUCT_END
 
@@ -262,8 +262,8 @@ PB_STATIC_ASSERT(sizeof(uint64_t) == 8, UINT64_T_WRONG_SIZE)
 #define PB_BYTES_ARRAY_T_ALLOCSIZE(n) ((size_t)n + offsetof(pb_bytes_array_t, bytes))
 
 struct pb_bytes_array_s {
-    pb_size_t size;
-    uint8_t bytes[1];
+  pb_size_t size;
+  uint8_t bytes[1];
 };
 typedef struct pb_bytes_array_s pb_bytes_array_t;
 
@@ -290,29 +290,29 @@ typedef struct pb_ostream_s pb_ostream_t;
 typedef struct pb_callback_s pb_callback_t;
 struct pb_callback_s {
 #ifdef PB_OLD_CALLBACK_STYLE
-    /* Deprecated since nanopb-0.2.1 */
-    union {
-        bool (*decode)(pb_istream_t *stream, const pb_field_t *field, void *arg);
-        bool (*encode)(pb_ostream_t *stream, const pb_field_t *field, const void *arg);
-    } funcs;
+  /* Deprecated since nanopb-0.2.1 */
+  union {
+    bool (*decode)(pb_istream_t *stream, const pb_field_t *field, void *arg);
+    bool (*encode)(pb_ostream_t *stream, const pb_field_t *field, const void *arg);
+  } funcs;
 #else
-    /* New function signature, which allows modifying arg contents in callback. */
-    union {
-        bool (*decode)(pb_istream_t *stream, const pb_field_t *field, void **arg);
-        bool (*encode)(pb_ostream_t *stream, const pb_field_t *field, void * const *arg);
-    } funcs;
-#endif    
-    
-    /* Free arg for use by callback */
-    void *arg;
+  /* New function signature, which allows modifying arg contents in callback. */
+  union {
+    bool (*decode)(pb_istream_t *stream, const pb_field_t *field, void **arg);
+    bool (*encode)(pb_ostream_t *stream, const pb_field_t *field, void * const *arg);
+  } funcs;
+#endif
+
+  /* Free arg for use by callback */
+  void *arg;
 };
 
 /* Wire types. Library user needs these only in encoder callbacks. */
 typedef enum {
-    PB_WT_VARINT = 0,
-    PB_WT_64BIT  = 1,
-    PB_WT_STRING = 2,
-    PB_WT_32BIT  = 5
+  PB_WT_VARINT = 0,
+  PB_WT_64BIT  = 1,
+  PB_WT_STRING = 2,
+  PB_WT_32BIT  = 5
 } pb_wire_type_t;
 
 /* Structure for defining the handling of unknown/extension fields.
@@ -324,44 +324,44 @@ typedef enum {
 typedef struct pb_extension_type_s pb_extension_type_t;
 typedef struct pb_extension_s pb_extension_t;
 struct pb_extension_type_s {
-    /* Called for each unknown field in the message.
-     * If you handle the field, read off all of its data and return true.
-     * If you do not handle the field, do not read anything and return true.
-     * If you run into an error, return false.
-     * Set to NULL for default handler.
-     */
-    bool (*decode)(pb_istream_t *stream, pb_extension_t *extension,
-                   uint32_t tag, pb_wire_type_t wire_type);
-    
-    /* Called once after all regular fields have been encoded.
-     * If you have something to write, do so and return true.
-     * If you do not have anything to write, just return true.
-     * If you run into an error, return false.
-     * Set to NULL for default handler.
-     */
-    bool (*encode)(pb_ostream_t *stream, const pb_extension_t *extension);
-    
-    /* Free field for use by the callback. */
-    const void *arg;
+  /* Called for each unknown field in the message.
+   * If you handle the field, read off all of its data and return true.
+   * If you do not handle the field, do not read anything and return true.
+   * If you run into an error, return false.
+   * Set to NULL for default handler.
+   */
+  bool (*decode)(pb_istream_t *stream, pb_extension_t *extension,
+                 uint32_t tag, pb_wire_type_t wire_type);
+
+  /* Called once after all regular fields have been encoded.
+   * If you have something to write, do so and return true.
+   * If you do not have anything to write, just return true.
+   * If you run into an error, return false.
+   * Set to NULL for default handler.
+   */
+  bool (*encode)(pb_ostream_t *stream, const pb_extension_t *extension);
+
+  /* Free field for use by the callback. */
+  const void *arg;
 };
 
 struct pb_extension_s {
-    /* Type describing the extension field. Usually you'll initialize
-     * this to a pointer to the automatically generated structure. */
-    const pb_extension_type_t *type;
-    
-    /* Destination for the decoded data. This must match the datatype
-     * of the extension field. */
-    void *dest;
-    
-    /* Pointer to the next extension handler, or NULL.
-     * If this extension does not match a field, the next handler is
-     * automatically called. */
-    pb_extension_t *next;
+  /* Type describing the extension field. Usually you'll initialize
+   * this to a pointer to the automatically generated structure. */
+  const pb_extension_type_t *type;
 
-    /* The decoder sets this to true if the extension was found.
-     * Ignored for encoding. */
-    bool found;
+  /* Destination for the decoded data. This must match the datatype
+   * of the extension field. */
+  void *dest;
+
+  /* Pointer to the next extension handler, or NULL.
+   * If this extension does not match a field, the next handler is
+   * automatically called. */
+  pb_extension_t *next;
+
+  /* The decoder sets this to true if the extension was found.
+   * Ignored for encoding. */
+  bool found;
 };
 
 /* Memory allocation functions to use. You can define pb_realloc and
@@ -445,7 +445,7 @@ struct pb_extension_s {
 #define PB_OPTIONAL_CALLBACK(tag, st, m, fd, ltype, ptr) \
     {tag, PB_ATYPE_CALLBACK | PB_HTYPE_OPTIONAL | ltype, \
     fd, 0, pb_membersize(st, m), 0, ptr}
-    
+
 #define PB_REPEATED_CALLBACK(tag, st, m, fd, ltype, ptr) \
     {tag, PB_ATYPE_CALLBACK | PB_HTYPE_REPEATED | ltype, \
     fd, 0, pb_membersize(st, m), 0, ptr}

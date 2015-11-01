@@ -9,9 +9,9 @@ classes that want to subscribe to sample events.
 #define _UNITINCREMENTLISTENER_H
 
 class UnitIncrementListener {
- public:
-  virtual ~UnitIncrementListener() {};
-  virtual void increment() = 0;
+  public:
+    virtual ~UnitIncrementListener() {};
+    virtual void increment() = 0;
 };
 
 #endif
