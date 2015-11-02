@@ -6,7 +6,8 @@ addons:
   apt:
     packages:
     - protobuf-compiler
-    - arduino
+before_install:
+  - source <(curl -SLs https://raw.githubusercontent.com/adafruit/travis-ci-arduino/master/install.sh)
 script:
  - pushd src/Continuous-Meter-Reader && make && popd
  - pushd src/RadioStation && make && popd
