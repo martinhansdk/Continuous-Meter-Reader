@@ -1,10 +1,14 @@
 language: cpp
 compiler:
   - gcc
-before_install:
- - sudo add-apt-get install golang protobuf-compiler arduino
+sudo: false
+addons:
+  apt:
+    packages:
+    - protobuf-compiler
+    - arduino
 script:
- - pushd test && make && popd
  - pushd src/Continuous-Meter-Reader && make && popd
  - pushd src/RadioStation && make && popd
+ - pushd test && make && popd
  #- ./script/travis_format_checcker.sh
