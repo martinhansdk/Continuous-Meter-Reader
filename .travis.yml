@@ -8,8 +8,7 @@ addons:
     - protobuf-compiler
     - gcc-avr
     - avr-libc
-before_install:
-  - source <(curl -SLs https://raw.githubusercontent.com/adafruit/travis-ci-arduino/master/install.sh)
+    - arduino
 script:
  - pushd src/Continuous-Meter-Reader && make && popd
  - pushd src/RadioStation && make && popd
