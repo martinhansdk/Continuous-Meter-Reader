@@ -77,8 +77,8 @@ void loop(void);
 #define F(x) (x)
 
 class ArduinoMockBase {
-public:
-	virtual ~ArduinoMockBase() {};
+  public:
+    virtual ~ArduinoMockBase() {};
     virtual void pinMode(uint8_t, uint8_t) = 0;
     virtual void analogWrite(uint8_t, int) = 0;
     virtual void digitalWrite(uint8_t, uint8_t) = 0;

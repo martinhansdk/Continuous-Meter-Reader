@@ -6,9 +6,9 @@
 #include "UnitIncrementListener.h"
 
 class MockUnitIncrementListener : public UnitIncrementListener {
- public:
-  MOCK_METHOD0(increment,
-      void());
+  public:
+    MOCK_METHOD0(increment,
+                 void());
 };
 
 #endif
