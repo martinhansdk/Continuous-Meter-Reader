@@ -10,7 +10,7 @@ addons:
     - avr-libc
     - arduino
 script:
- - pushd src/Continuous-Meter-Reader && make && popd
- - pushd src/RadioStation && make && popd
- - pushd test && make && popd
+ - cd $TRAVIS_BUILD_DIR/src/Continuous-Meter-Reader && make
+ - cd $TRAVIS_BUILD_DIR/src/RadioStation && make
+ - cd $TRAVIS_BUILD_DIR/test && make
  #- ./script/travis_format_checcker.sh
