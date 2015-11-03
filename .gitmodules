@@ -7,3 +7,6 @@
 [submodule "goocglemock2"]
 	path = googlemock
 	url = https://github.com/martinhansdk/googlemock
+[submodule "googlemock"]
+	path = googlemock
+	url = https://github.com/martinhansdk/googlemock
