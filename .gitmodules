@@ -4,9 +4,6 @@
 [submodule "lib/RF24"]
 	path = lib/RF24
 	url = https://github.com/TMRh20/RF24
-[submodule "goocglemock2"]
-	path = googlemock
-	url = https://github.com/martinhansdk/googlemock
 [submodule "googlemock"]
 	path = googlemock
 	url = https://github.com/martinhansdk/googlemock
