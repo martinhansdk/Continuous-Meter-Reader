@@ -18,7 +18,7 @@ class CommunicateSerialTest : public ::testing::Test {
 };
 
 TEST_F(CommunicateSerialTest, canSendAndReceiveUpdate) {
-  const int32_t METER_ID = 1234567;
+  const uint32_t METER_ID = 1234567;
   const uint32_t SERIES_ID = 390123456;
   const uint64_t CURRENT_VALUE = 917253829100362;
   const size_t BEGIN_GARBAGE = 45;
