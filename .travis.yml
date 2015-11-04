@@ -2,6 +2,7 @@ language: cpp
 compiler:
   - gcc
 sudo: false
+dist: trusty
 git:
   submodules: false
 addons:
