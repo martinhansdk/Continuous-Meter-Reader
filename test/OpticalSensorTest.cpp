@@ -47,7 +47,7 @@ class ArduinoFakeForSensorTest : public ArduinoMockBase {
   public:
     ArduinoFakeForSensorTest() : time(0) {};
     void setWaveform(int pin, string wavedef) {
-      if(waveform.size() <= pin) {
+      if((int)waveform.size() <= pin) {
         waveform.resize(pin + 1);
       }
       waveform[pin] = wavedef;
@@ -56,7 +56,7 @@ class ArduinoFakeForSensorTest : public ArduinoMockBase {
       time++;
     }
 
-    virtual void pinMode(uint8_t pin, uint8_t mode) {
+    virtual void pinMode(uint8_t, uint8_t mode) {
       ASSERT_EQ(INPUT, mode) << "All pins should be inputs";
     };
     virtual void analogWrite(uint8_t, int) {};
@@ -64,7 +64,7 @@ class ArduinoFakeForSensorTest : public ArduinoMockBase {
       FAIL() << "Should not write to outputs";
     };
     virtual int digitalRead(int pin) {
-      if(pin >= waveform.size()) {
+      if(pin >= (int)waveform.size()) {
         pin = waveform.size() - 1;
       }
 

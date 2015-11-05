@@ -33,7 +33,7 @@ ARDUINO_MOCK_FILES =  Arduino.cc
 OBJS = $(SRC_CXX_FILES:.cpp=.o) $(SRC_C_FILES:.c=.o) $(ARDUINO_MOCK_FILES:.cc=.o) $(TEST_FILES:.cpp=.o)
 
 # Flags passed to the preprocessor.
-CPPFLAGS += -I. -I.. -I$(GTEST_DIR)/include -I$(GMOCK_DIR)/include -I$(ARDUINO_MOCK_DIR)/include -I$(ARDUINO_MOCK_DIR)/include/arduino-mock -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS
+CPPFLAGS += -I. -I.. -I$(GTEST_DIR)/include -I$(GMOCK_DIR)/include -I$(ARDUINO_MOCK_DIR)/include -I$(ARDUINO_MOCK_DIR)/include/arduino-mock -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -DGTEST_HAS_PTHREAD=0
 
 CXX=clang++
 
