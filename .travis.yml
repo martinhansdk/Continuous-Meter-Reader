@@ -1,19 +1,13 @@
 language: cpp
 compiler:
   - gcc
-sudo: false
+sudo: required
 dist: trusty
 git:
   submodules: false
-addons:
-  apt:
-    packages:
-    - protobuf-compiler
-    - gcc-avr
-    - avr-libc
-    - arduino
 before_install:
   - git submodule update --init --recursive
+  - sudo apt-get install protobuf-compiler gcc-avr avr-libc arduino
 script:
  - cd $TRAVIS_BUILD_DIR/src/Continuous-Meter-Reader && make
  - cd $TRAVIS_BUILD_DIR/src/RadioStation && make
