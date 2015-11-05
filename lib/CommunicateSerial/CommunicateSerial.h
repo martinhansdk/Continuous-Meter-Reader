@@ -49,7 +49,7 @@ class Receiver {
     State state;
     Stream &s;
     int preamble_seen;
-    size_t len;
+    uint32_t len;
     uint32_t calculated_crc;
   public:
     M message;
