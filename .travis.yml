@@ -8,7 +8,7 @@ git:
 before_install:
   - git submodule update --init --recursive
   - sudo apt-get update -qq
-  - sudo apt-get install protobuf-compiler gcc-avr avr-libc arduino
+  - sudo apt-get install -y protobuf-compiler gcc-avr avr-libc arduino
 script:
  - cd $TRAVIS_BUILD_DIR/src/Continuous-Meter-Reader && make
  - cd $TRAVIS_BUILD_DIR/src/RadioStation && make
