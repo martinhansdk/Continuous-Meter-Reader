@@ -1,0 +1,20 @@
+[Eagle]
+Version="07 01 00"
+Platform="Linux"
+Serial="62191E841E-LSR-WLM-1EL"
+Globals="Globals"
+Desktop="Desktop"
+
+[Globals]
+AutoSaveProject=1
+UsedLibrary="watermeter.lbr"
+
+[Win_1]
+Type="Control Panel"
+Loc="0 27 1679 1013"
+State=1
+Number=0
+
+[Desktop]
+Screen="3840 1200"
+Window="Win_1"

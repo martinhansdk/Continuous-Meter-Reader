@@ -1,0 +1,34 @@
+Partlist exported from C:/Users/Hans/Documents/eagle/Optical water meter reader/optical meter reader.sch at 28-Aug-15 11:16 PM
+
+Part Value       Device      Package Description                
+C1   2.2u        C-EUC0603   C0603   CAPACITOR, European symbol 
+C2   100n        C-USC0603   C0603   CAPACITOR, American symbol 
+C3   100n        C-USC0603   C0603   CAPACITOR, American symbol 
+JP1              PINHD-1X2   1X02    PIN HEADER                 
+JP2  RF24        PINHD-2X4   2X04    PIN HEADER                 
+R1   220         R-US_R0603  R0603   RESISTOR, American symbol  
+R2   220         R-US_R0603  R0603   RESISTOR, American symbol  
+R3   220         R-US_R0603  R0603   RESISTOR, American symbol  
+R4   220         R-US_R0603  R0603   RESISTOR, American symbol  
+R5   220         R-US_R0603  R0603   RESISTOR, American symbol  
+R6   220         R-US_R0603  R0603   RESISTOR, American symbol  
+R7   10k         R-US_R0603  R0603   RESISTOR, American symbol  
+R8   10k         R-US_R0603  R0603   RESISTOR, American symbol  
+R9   10k         R-US_R0603  R0603   RESISTOR, American symbol  
+R10  10k         R-US_R0603  R0603   RESISTOR, American symbol  
+R11  10k         R-US_R0603  R0603   RESISTOR, American symbol  
+R12  10k         R-US_R0603  R0603   RESISTOR, American symbol  
+R13  220         R-US_R0603  R0603   RESISTOR, American symbol  
+R14  10k         R-US_R0603  R0603   RESISTOR, American symbol  
+R15  1k          R-US_R0603  R0603   RESISTOR, American symbol  
+S0   GP2S700HCP  GP2S700HCP  SMD                                
+S1   GP2S700HCP  GP2S700HCP  SMD                                
+S2   GP2S700HCP  GP2S700HCP  SMD                                
+S3   GP2S700HCP  GP2S700HCP  SMD                                
+S4   GP2S700HCP  GP2S700HCP  SMD                                
+S5   GP2S700HCP  GP2S700HCP  SMD                                
+S6   GP2S700HCP  GP2S700HCP  SMD                                
+U$1  ARDUINONANO ARDUINONANO PDIP-32                            
+U$2  IRLML6401   IRLML6401   SOT23                              
+U1   SN743G17DCT SN743G17DCT SSOP08                             
+U2   SN743G17DCT SN743G17DCT SSOP08                             
