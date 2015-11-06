@@ -1,6 +1,7 @@
 //-*-c++-*-
 /* Meter reader */
 
+#include <avr/power.h>
 #include <SPI.h>
 #include "Histogram.h"
 #include "Meter.h"
@@ -101,7 +102,12 @@ void setup() {
 
   radioSender.begin(settings.s.meterId, settings.s.seriesId);
 
-// initialize timer1
+  // turn off unneeded hardware
+  power_adc_disable();
+  power_twi_disable();
+  power_timer2_disable();
+
+  // initialize timer1
   noInterrupts();           // disable all interrupts
   TCCR1A = 0;
   TCCR1B = 0;
