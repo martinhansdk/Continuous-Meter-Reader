@@ -15,49 +15,49 @@ extern "C" {
 
 /* Enum definitions */
 typedef enum _MeterReader_LogMessage_Type {
-    MeterReader_LogMessage_Type_ERROR = 0,
-    MeterReader_LogMessage_Type_NOTE = 1
+  MeterReader_LogMessage_Type_ERROR = 0,
+  MeterReader_LogMessage_Type_NOTE = 1
 } MeterReader_LogMessage_Type;
 
 typedef enum _MeterReader_Settings_CommunicationChannel {
-    MeterReader_Settings_CommunicationChannel_SERIAL = 0,
-    MeterReader_Settings_CommunicationChannel_WIRELESS = 1
+  MeterReader_Settings_CommunicationChannel_SERIAL = 0,
+  MeterReader_Settings_CommunicationChannel_WIRELESS = 1
 } MeterReader_Settings_CommunicationChannel;
 
 /* Struct definitions */
 typedef struct _MeterReader_StartCalibration {
-    uint8_t dummy_field;
+  uint8_t dummy_field;
 } MeterReader_StartCalibration;
 
 typedef struct _MeterReader_CounterUpdate {
-    uint32_t meterId;
-    uint32_t seriesId;
-    uint64_t currentCounterValue;
+  uint32_t meterId;
+  uint32_t seriesId;
+  uint64_t currentCounterValue;
 } MeterReader_CounterUpdate;
 
 typedef struct _MeterReader_LogMessage {
-    MeterReader_LogMessage_Type type;
-    char text[40];
+  MeterReader_LogMessage_Type type;
+  char text[40];
 } MeterReader_LogMessage;
 
 typedef struct _MeterReader_Settings {
-    uint32_t meterId;
-    uint32_t seriesId;
-    MeterReader_Settings_CommunicationChannel communicationChannel;
-    pb_size_t risingEdgeAmounts_count;
-    uint32_t risingEdgeAmounts[6];
-    pb_size_t fallingEdgeAmounts_count;
-    uint32_t fallingEdgeAmounts[6];
+  uint32_t meterId;
+  uint32_t seriesId;
+  MeterReader_Settings_CommunicationChannel communicationChannel;
+  pb_size_t risingEdgeAmounts_count;
+  uint32_t risingEdgeAmounts[6];
+  pb_size_t fallingEdgeAmounts_count;
+  uint32_t fallingEdgeAmounts[6];
 } MeterReader_Settings;
 
 typedef struct _MeterReader_Message {
-    pb_size_t which_message;
-    union {
-        MeterReader_CounterUpdate update;
-        MeterReader_StartCalibration calibrate;
-        MeterReader_Settings settings;
-        MeterReader_LogMessage log;
-    } message;
+  pb_size_t which_message;
+  union {
+    MeterReader_CounterUpdate update;
+    MeterReader_StartCalibration calibrate;
+    MeterReader_Settings settings;
+    MeterReader_LogMessage log;
+  } message;
 } MeterReader_Message;
 
 /* Default values for struct fields */
@@ -111,7 +111,7 @@ extern const pb_field_t MeterReader_Settings_fields[6];
 #ifdef PB_MSGID
 
 #define METERREADER_MESSAGES \
-
+ 
 
 #endif
 
