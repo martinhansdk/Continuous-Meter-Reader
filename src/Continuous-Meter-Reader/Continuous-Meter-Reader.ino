@@ -2,6 +2,7 @@
 /* Meter reader */
 
 #include <avr/power.h>
+#include <avr/sleep.h>
 #include <SPI.h>
 #include "Histogram.h"
 #include "Meter.h"
@@ -107,6 +108,10 @@ void setup() {
   power_twi_disable();
   power_timer2_disable();
 
+  // choose a sleep mode
+  set_sleep_mode(SLEEP_MODE_IDLE);
+  sleep_enable(); // enables the sleep bit in the mcucr register so sleep is possible. just a safety pin
+
   // initialize timer1
   noInterrupts();           // disable all interrupts
   TCCR1A = 0;
@@ -204,5 +209,8 @@ void loop() {
     }
   }
 
+  sleep_mode();     // here the device is actually put to sleep
+  // the program continues from here after waking up
+  sleep_disable();  // first thing after waking from sleep: disable sleep
 }
 
