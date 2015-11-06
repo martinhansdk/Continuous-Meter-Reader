@@ -201,9 +201,6 @@ type Settings struct {
 	MeterId              *uint32                        `protobuf:"varint,1,req,name=meterId" json:"meterId,omitempty"`
 	SeriesId             *uint32                        `protobuf:"varint,2,req,name=seriesId" json:"seriesId,omitempty"`
 	CommunicationChannel *Settings_CommunicationChannel `protobuf:"varint,4,req,name=communicationChannel,enum=MeterReader.Settings_CommunicationChannel" json:"communicationChannel,omitempty"`
-	// Analog sampling: comparator settings
-	Threshold  *uint32 `protobuf:"varint,5,req,name=threshold" json:"threshold,omitempty"`
-	Hysteresis *uint32 `protobuf:"varint,6,req,name=hysteresis" json:"hysteresis,omitempty"`
 	// Digital sampling: edge amounts
 	RisingEdgeAmounts  []uint32 `protobuf:"varint,8,rep,name=risingEdgeAmounts" json:"risingEdgeAmounts,omitempty"`
 	FallingEdgeAmounts []uint32 `protobuf:"varint,9,rep,name=fallingEdgeAmounts" json:"fallingEdgeAmounts,omitempty"`
@@ -233,20 +230,6 @@ func (m *Settings) GetCommunicationChannel() Settings_CommunicationChannel {
 		return *m.CommunicationChannel
 	}
 	return Settings_SERIAL
-}
-
-func (m *Settings) GetThreshold() uint32 {
-	if m != nil && m.Threshold != nil {
-		return *m.Threshold
-	}
-	return 0
-}
-
-func (m *Settings) GetHysteresis() uint32 {
-	if m != nil && m.Hysteresis != nil {
-		return *m.Hysteresis
-	}
-	return 0
 }
 
 func (m *Settings) GetRisingEdgeAmounts() []uint32 {

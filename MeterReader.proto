@@ -41,10 +41,6 @@ message Settings {
   };
   required CommunicationChannel communicationChannel = 4;
 
-  // Analog sampling: comparator settings
-  required uint32 threshold = 5;
-  required uint32 hysteresis = 6;
-
   // Digital sampling: edge amounts
   repeated uint32 risingEdgeAmounts = 8;
   repeated uint32 fallingEdgeAmounts = 9;

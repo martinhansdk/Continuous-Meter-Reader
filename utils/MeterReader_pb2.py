@@ -18,7 +18,7 @@ _sym_db = _symbol_database.Default()
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='MeterReader.proto',
   package='MeterReader',
-  serialized_pb=_b('\n\x11MeterReader.proto\x12\x0bMeterReader\"\xc9\x01\n\x07Message\x12,\n\x06update\x18\x01 \x01(\x0b\x32\x1a.MeterReader.CounterUpdateH\x00\x12\x32\n\tcalibrate\x18\x02 \x01(\x0b\x32\x1d.MeterReader.StartCalibrationH\x00\x12)\n\x08settings\x18\x03 \x01(\x0b\x32\x15.MeterReader.SettingsH\x00\x12&\n\x03log\x18\x04 \x01(\x0b\x32\x17.MeterReader.LogMessageH\x00\x42\t\n\x07message\"c\n\nLogMessage\x12*\n\x04type\x18\x01 \x02(\x0e\x32\x1c.MeterReader.LogMessage.Type\x12\x0c\n\x04text\x18\x02 \x02(\t\"\x1b\n\x04Type\x12\t\n\x05\x45RROR\x10\x00\x12\x08\n\x04NOTE\x10\x01\"O\n\rCounterUpdate\x12\x0f\n\x07meterId\x18\x01 \x02(\r\x12\x10\n\x08seriesId\x18\x02 \x02(\r\x12\x1b\n\x13\x63urrentCounterValue\x18\x03 \x02(\x04\"\x12\n\x10StartCalibration\"\x87\x02\n\x08Settings\x12\x0f\n\x07meterId\x18\x01 \x02(\r\x12\x10\n\x08seriesId\x18\x02 \x02(\r\x12H\n\x14\x63ommunicationChannel\x18\x04 \x02(\x0e\x32*.MeterReader.Settings.CommunicationChannel\x12\x11\n\tthreshold\x18\x05 \x02(\r\x12\x12\n\nhysteresis\x18\x06 \x02(\r\x12\x19\n\x11risingEdgeAmounts\x18\x08 \x03(\r\x12\x1a\n\x12\x66\x61llingEdgeAmounts\x18\t \x03(\r\"0\n\x14\x43ommunicationChannel\x12\n\n\x06SERIAL\x10\x00\x12\x0c\n\x08WIRELESS\x10\x01')
+  serialized_pb=_b('\n\x11MeterReader.proto\x12\x0bMeterReader\"\xc9\x01\n\x07Message\x12,\n\x06update\x18\x01 \x01(\x0b\x32\x1a.MeterReader.CounterUpdateH\x00\x12\x32\n\tcalibrate\x18\x02 \x01(\x0b\x32\x1d.MeterReader.StartCalibrationH\x00\x12)\n\x08settings\x18\x03 \x01(\x0b\x32\x15.MeterReader.SettingsH\x00\x12&\n\x03log\x18\x04 \x01(\x0b\x32\x17.MeterReader.LogMessageH\x00\x42\t\n\x07message\"c\n\nLogMessage\x12*\n\x04type\x18\x01 \x02(\x0e\x32\x1c.MeterReader.LogMessage.Type\x12\x0c\n\x04text\x18\x02 \x02(\t\"\x1b\n\x04Type\x12\t\n\x05\x45RROR\x10\x00\x12\x08\n\x04NOTE\x10\x01\"O\n\rCounterUpdate\x12\x0f\n\x07meterId\x18\x01 \x02(\r\x12\x10\n\x08seriesId\x18\x02 \x02(\r\x12\x1b\n\x13\x63urrentCounterValue\x18\x03 \x02(\x04\"\x12\n\x10StartCalibration\"\xe0\x01\n\x08Settings\x12\x0f\n\x07meterId\x18\x01 \x02(\r\x12\x10\n\x08seriesId\x18\x02 \x02(\r\x12H\n\x14\x63ommunicationChannel\x18\x04 \x02(\x0e\x32*.MeterReader.Settings.CommunicationChannel\x12\x19\n\x11risingEdgeAmounts\x18\x08 \x03(\r\x12\x1a\n\x12\x66\x61llingEdgeAmounts\x18\t \x03(\r\"0\n\x14\x43ommunicationChannel\x12\n\n\x06SERIAL\x10\x00\x12\x0c\n\x08WIRELESS\x10\x01')
 )
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -63,8 +63,8 @@ _SETTINGS_COMMUNICATIONCHANNEL = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=656,
-  serialized_end=704,
+  serialized_start=617,
+  serialized_end=665,
 )
 _sym_db.RegisterEnumDescriptor(_SETTINGS_COMMUNICATIONCHANNEL)
 
@@ -257,28 +257,14 @@ _SETTINGS = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='threshold', full_name='MeterReader.Settings.threshold', index=3,
-      number=5, type=13, cpp_type=3, label=2,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    _descriptor.FieldDescriptor(
-      name='hysteresis', full_name='MeterReader.Settings.hysteresis', index=4,
-      number=6, type=13, cpp_type=3, label=2,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    _descriptor.FieldDescriptor(
-      name='risingEdgeAmounts', full_name='MeterReader.Settings.risingEdgeAmounts', index=5,
+      name='risingEdgeAmounts', full_name='MeterReader.Settings.risingEdgeAmounts', index=3,
       number=8, type=13, cpp_type=3, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='fallingEdgeAmounts', full_name='MeterReader.Settings.fallingEdgeAmounts', index=6,
+      name='fallingEdgeAmounts', full_name='MeterReader.Settings.fallingEdgeAmounts', index=4,
       number=9, type=13, cpp_type=3, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -297,7 +283,7 @@ _SETTINGS = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=441,
-  serialized_end=704,
+  serialized_end=665,
 )
 
 _MESSAGE.fields_by_name['update'].message_type = _COUNTERUPDATE
