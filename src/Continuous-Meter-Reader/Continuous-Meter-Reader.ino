@@ -15,7 +15,16 @@
 
 Settings<MeterReader_Settings> settings;
 
-#define ADCPIN A7
+#define POWER_ENABLE_PIN A1
+
+// the power enable pin is active low because it is connected to a P-MOS transistor
+inline void power_leds_on() {
+  digitalWrite(POWER_ENABLE_PIN, LOW);
+}
+
+inline void power_leds_off() {
+  digitalWrite(POWER_ENABLE_PIN, HIGH);
+}
 
 // Hardware configuration: Set up nRF24L01 radio on SPI bus plus pins 9 & 10
 RF24 radio(9, 10);
@@ -52,6 +61,8 @@ void setup() {
   calibrationMode = false;
   calibrationDone = false;
 
+  pinMode(POWER_ENABLE_PIN, OUTPUT);
+  power_leds_off();
 
   // pick the next series
   settings.load();
@@ -103,6 +114,7 @@ void setup() {
 }
 
 ISR(TIMER1_COMPA_vect) {        // timer compare interrupt service routine
+  power_leds_on();
   if(calibrationMode) {
     if(calibrator.tick()) {
       calibrationMode = false;
@@ -113,6 +125,7 @@ ISR(TIMER1_COMPA_vect) {        // timer compare interrupt service routine
     for(int sensor = 0; sensor < settings.s.risingEdgeAmounts_count ; sensor++) {
       change += digitalSensors[sensor].getAmount();
     }
+    power_leds_off();
     meter.add(change);
 
     ticks++;
