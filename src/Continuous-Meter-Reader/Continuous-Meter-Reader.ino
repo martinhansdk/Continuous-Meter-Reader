@@ -97,6 +97,7 @@ void setup() {
   radio.openReadingPipe(1, (const uint8_t*)addresses[0]);
   radio.enableDynamicPayloads();
   radio.stopListening();
+  radio.powerDown();
 
   radioSender.begin(settings.s.meterId, settings.s.seriesId);
 
@@ -151,7 +152,9 @@ void loop() {
 
     if(true || currentValue != lastSentValue) {
       if(settings.s.communicationChannel == MeterReader_Settings_CommunicationChannel_WIRELESS) {
+        radio.powerUp();
         sendCounterUpdateByRadio(radioSender, settings.s.meterId, settings.s.seriesId, currentValue);
+        radio.powerDown();
       } else {
         sendCounterUpdate(Serial, settings.s.meterId, settings.s.seriesId, currentValue);
       }
