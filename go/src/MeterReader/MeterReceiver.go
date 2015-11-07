@@ -146,6 +146,13 @@ func SendStartCalibration(conn io.Writer) {
 	sendMessage(conn, msg)
 }
 
+func SendUpdate(conn io.Writer, update *CounterUpdate) {
+	msg := new(Message)
+	msg.Update = update
+
+	sendMessage(conn, msg)
+}
+
 func sendMessage(conn io.Writer, message *Message) {
 	_, err := io.WriteString(conn, "AA") // preamble
 	if err != nil {
