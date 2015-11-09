@@ -55,11 +55,10 @@ Attach the Arduino for the server receiver station and run
 
     cd go
     export GOPATH=$PWD
-    go get MeterReader
-    go get github.com/googollee/go-socket.io
-    go get github.com/tarm/serial
+    go get -d
     go build MeterServer.go 
     go build ConfigNode.go 
+    go build SampleSender.go 
 
 ### Configuring the Arduino for a meter
 
