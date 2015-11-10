@@ -79,3 +79,22 @@ The calibration procedure is as follows:
 4. Run the command `go/ConfigNode -serial=/dev/ttyUSB0 -calibrate`
 5. The command will exit when calibration is complete
 
+If everything is ok, the example output should look something like this:
+
+    2015/11/10 22:25:00 Waiting for current settings
+    2015/11/10 22:25:00 Connection established
+    2015/11/10 22:25:00 Waiting for data
+    2015/11/10 22:25:02 len= 14
+    2015/11/10 22:25:02 n=14
+    2015/11/10 22:25:02 NOTE : Received 'Rebooted'
+    2015/11/10 22:25:02 Waiting for data
+    2015/11/10 22:25:02 len= 24
+    2015/11/10 22:25:02 n=24
+    2015/11/10 22:25:02 Waiting for data
+    2015/11/10 22:25:02 Got current settings
+    {"meterId":2,"seriesId":73,"communicationChannel":1,"risingEdgeAmounts":[0,1,2,3,4,5],"fallingEdgeAmounts":[0,1,2,3,4,5]}
+    2015/11/10 22:25:02 id=4294967295
+    2015/11/10 22:25:57 len= 27
+    2015/11/10 22:25:57 n=27
+    2015/11/10 22:25:57 Waiting for data
+    {"meterId":2,"seriesId":73,"communicationChannel":1,"risingEdgeAmounts":[127,93,117,149,169,153],"fallingEdgeAmounts":[33,15,17,38,41,48]}
