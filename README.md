@@ -10,7 +10,7 @@ Currently Sensus water meters are supported. They look like this:
 
 <img alt="Sensus water meter" src="pcb/Optical water meter reader/sensus_meter.jpg" width="50%">
 
-I have designed a PCB which fits on top of the water meter which uses [GP2S700HCP reflective photointerrupter](http://www.sharp-world.com/products/device/lineup/data/pdf/datasheet/gp2s700hcp_e.pdf) sensors to read the turning of the half shiny half red disc. The makes one turn per liter. The PCB has six optical sensors, so it can sense quantities around 1/12 of a liter. The reflective part of the disc is not exactly a half circle, so the exact 12 quantities measured are different from each other. An automatic calibration method is provided which determines how much each quantity is.
+I have designed a PCB which fits on top of the water meter which uses [GP2S700HCP reflective photointerrupter](http://www.sharp-world.com/products/device/lineup/data/pdf/datasheet/gp2s700hcp_e.pdf) sensors to read the turning of the half shiny half red disc. The makes one turn per liter. The PCB has six optical sensors, so it can sense quantities around 1/12 of a liter. The reflective part of the disc is not exactly a half circle, so the exact 12 quantities measured are different from each other. An automatic calibration method is provided which determines how much each quantity is. You can print a [PDF rendering of the PCB layout](pcb/Optical water meter reader/optical meter reader board.pdf), make 5mm holes for the steering pins plus a small hole for the middle of the sensor circle in your printout and see if it will fit on your meter. When attached to your meter the small hole should be right above the center of the disc.
 
 <img alt="Photo of the PCB" src="pcb/Optical water meter reader/optical meter reader pcb photo.png" width="50%">
 
@@ -55,9 +55,7 @@ Attach the Arduino for the server receiver station and run
 
     cd go
     export GOPATH=$PWD
-    go get MeterReader
-    go get github.com/googollee/go-socket.io
-    go get github.com/tarm/serial
+    go get -d
     go build MeterServer.go 
     go build ConfigNode.go 
     go build SampleSender.go 
@@ -124,3 +122,23 @@ Running tests with out having to flush a lot of water makes sense, so use the
    ./SampleSender
 
 for this purpose.
+
+If everything is ok, the example output should look something like this:
+
+    2015/11/10 22:25:00 Waiting for current settings
+    2015/11/10 22:25:00 Connection established
+    2015/11/10 22:25:00 Waiting for data
+    2015/11/10 22:25:02 len= 14
+    2015/11/10 22:25:02 n=14
+    2015/11/10 22:25:02 NOTE : Received 'Rebooted'
+    2015/11/10 22:25:02 Waiting for data
+    2015/11/10 22:25:02 len= 24
+    2015/11/10 22:25:02 n=24
+    2015/11/10 22:25:02 Waiting for data
+    2015/11/10 22:25:02 Got current settings
+    {"meterId":2,"seriesId":73,"communicationChannel":1,"risingEdgeAmounts":[0,1,2,3,4,5],"fallingEdgeAmounts":[0,1,2,3,4,5]}
+    2015/11/10 22:25:02 id=4294967295
+    2015/11/10 22:25:57 len= 27
+    2015/11/10 22:25:57 n=27
+    2015/11/10 22:25:57 Waiting for data
+    {"meterId":2,"seriesId":73,"communicationChannel":1,"risingEdgeAmounts":[127,93,117,149,169,153],"fallingEdgeAmounts":[33,15,17,38,41,48]}

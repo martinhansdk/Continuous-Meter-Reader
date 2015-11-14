@@ -67,7 +67,14 @@ func (msh *MeterStateHandler) Translate(msg *CounterUpdate) *MeterUpdate {
 		meter.CurrentSeries = SeriesId
 		meter.StartCount = meter.LastCount
 	}
-	meter.LastCount = meter.StartCount + CurrentCounterValue
+
+	newCount := meter.StartCount + CurrentCounterValue
+
+	changed := false
+	if newCount != meter.LastCount {
+		changed = true
+	}
+	meter.LastCount = newCount
 
 	log.Printf("meterid=%d series=%d counter=%d -> absolute=%d\n", MeterId, SeriesId, CurrentCounterValue, meter.LastCount)
 
@@ -79,7 +86,9 @@ func (msh *MeterStateHandler) Translate(msg *CounterUpdate) *MeterUpdate {
 		Value:      meter.LastCount,
 	}
 
-	msh.mdb.InsertMeasurement(&umsg)
+	if changed {
+		msh.mdb.InsertMeasurement(&umsg)
+	}
 
 	return &umsg
 }
