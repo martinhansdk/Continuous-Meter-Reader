@@ -24,7 +24,7 @@ The communication protocol between the embedded code and the server is based on 
 
 ## Build instructions
 
-All build instructions assume Ubuntu 14.04 or later.
+All build instructions assume Ubuntu 15.04 or later.
 
 ### Install prerequisites
 
@@ -60,6 +60,7 @@ Attach the Arduino for the server receiver station and run
     go get github.com/tarm/serial
     go build MeterServer.go 
     go build ConfigNode.go 
+    go build SampleSender.go 
 
 ### Setup the Postgresql database
 
@@ -119,7 +120,7 @@ Contact the server using http://localhost:2111/static
 
 Running tests with out having to flush a lot of water makes sense, so use the
 
-   utils/SampleSender.py
+   cd go
+   ./SampleSender
 
-for this purpose. Run it using Python.
-
+for this purpose.
