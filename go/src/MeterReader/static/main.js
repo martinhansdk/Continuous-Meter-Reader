@@ -29,44 +29,53 @@ var timedata = [
 
 // Maintain state here.
 var Main = React.createClass({
-   // Set initial state
-   getInitialState: function() {
-       return {
-	   meterSelection: 1
-       };
-   },
+    // Set initial state
+    getInitialState: function() {
+	return {
+	    selectedMeter: 1
+	};
+    },
 
-   // Mount socket and wait for "meter update" events.
-   componentDidMount: function() {
-       var that = this;
-       this.socket = io();
-       this.socket.on('meter update', function (data) {
-           console.log("JSON recv:", data);
-           that.addMeterUpdate(data);
-       });
-   },
-
-   addMeterUpdate: function(update) {
-       var data = this.props.meterList;
-       var len  = data.length;
+    // Mount socket and wait for "meter update" events.
+    componentDidMount: function() {
+	var that = this;
+	this.socket = io();
+	this.socket.on('meter update', function (data) {
+            console.log("JSON recv:", data);
+//            that.addMeterUpdate(data);
+	});
+    },
+/*
+    addMeterUpdate: function(update) {
+	var data = this.props.meterList;
+	var len  = data.length;
    
-       console.log("props.data:", data);
+	console.log("props.data:", data);
    
-       // Find the right meter and overwrite with the update.
-       for (var i = 0; i < len; i++) {
-           if(data[i].meter == update.meter) {
-               data[i] = update;
-           }
-       }
-       this.setState(data);
-   },
+	// Find the right meter and overwrite with the update.
+	for (var i = 0; i < len; i++) {
+            if(data[i].meter == update.meter) {
+		data[i] = update;
+            }
+	}
+	this.setState(data);
+    },
+*/
+    /* Handler for selection of Meters in the left panel */
+    /* This is passed React style through the hierarchy to the individual buttons
+       so that the state can live in the top component.
+    */
+    meterSelectionHandler: function(meter) {
+	console.log("Meter selected is: ", meter);
+	this.setState({ selectedMeter : meter});
+    },
 
     render: function() {
         console.log("Main");
 	return (
 	    <div>
-		<LeftPanel meterList={this.props.meterList}/>
-		<RightPanel />
+		<LeftPanel meterList={this.props.meterList} onUpdate={this.meterSelectionHandler}/>
+		<RightPanel meterID={this.state.selectedMeter} />
 	    </div>
 	);
     }
@@ -84,8 +93,26 @@ var HiThere = React.createClass({
 ReactDOM.render(<HiThere />, document.getElementById('main'));
 */
 
+/*
+// Bootstrap React example
+var ButtonGroup = ReactBootstrap.ButtonGroup;
+var Button = ReactBootstrap.Button;
+var MenuItem = ReactBootstrap.MenuItem;
+var DropdownButton = ReactBootstrap.DropdownButton;
+var buttonGroupInstance = (
+  <ButtonGroup>
+    <DropdownButton bsStyle="success" title="Dropdown">
+      <MenuItem key="1">Dropdown link</MenuItem>
+      <MenuItem key="2">Dropdown link</MenuItem>
+    </DropdownButton>
+    <Button bsStyle="info">Middle</Button>
+    <Button bsStyle="info">Right</Button>
+  </ButtonGroup>
+);
+ReactDOM.render(buttonGroupInstance, document.getElementById("main"));
+*/
+
 // Seed the initial state of the webpage. The remaining of the time socket.io does the work.
 $.getJSON( "/api/currentabsolutevalues", function( meters ) {
-//   ReactDOM.render(<MeterList meterList={meters}/>, document.getElementById("meterlist"));
    ReactDOM.render(<Main meterList={meters}/>, document.getElementById("main"));
 });

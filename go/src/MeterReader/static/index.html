@@ -12,17 +12,21 @@
     <script src="build/react-dom.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/JSXTransformer.js"></script>
 
-<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.2/react.js"></script> -->
-
-<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/6.0.20/browser.min.js"></script> -->
-<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/6to5/3.6.5/browser.js"></script> -->
-<!--    <script src="build/browser.min.js"></script> -->
-
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
-<!-- Optional theme -->
-<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" integrity="sha384-aUGj/X2zp5rLCbBxumKTCw2Z50WgIr1vs/PFN4praOTvYXWlVyh2UtNUU0KAUhAX" crossorigin="anonymous">
+    <!-- React 0.14.x someday -->
+<!--
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.2/react.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.2/react-dom.min.js"></script>
+Needs Babel or compiler to go to JS for production mode. Especially for React 0.14+!
+< ! - -    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/6.0.20/browser.min.js"></script> - - >
+< ! - -    <script src="https://cdnjs.cloudflare.com/ajax/libs/6to5/3.6.5/browser.js"></script> - - >
+< ! - -    <script src="build/browser.min.js"></script> - - >
 -->
+
+    <!-- Add Bootstrap CSS (JS has to be at the bottom -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+    <!-- Optional theme -->
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" integrity="sha384-aUGj/X2zp5rLCbBxumKTCw2Z50WgIr1vs/PFN4praOTvYXWlVyh2UtNUU0KAUhAX" crossorigin="anonymous"> -->
+
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -30,13 +34,12 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 
-    <!-- Bootstrap for React -->
+    <!-- Bootstrap for React 0.27.x series is for React 0.14.x+ only-->
+    <!-- DOCS: https://react-bootstrap.github.io/components.html -->
+    <script src="build/react-bootstrap.js"></script>
+<!--    <script src="http://libs.cdnjs.net/react-bootstrap/0.26.4/react-bootstrap.min.js"></script> (works but slow)-->
 <!--
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.2/react-dom.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-bootstrap/0.27.3/react-bootstrap.min.js"></script>
-    <script>
-      var Alert = ReactBootstrap.Alert;
-    </script>
 -->
 
     <!-- Graphing -->
@@ -52,6 +55,7 @@
     <!-- socket.io -->
     <script src="https://cdn.socket.io/socket.io-1.3.5.js"></script>
 
+    <!-- Our Own Application -->
     <script  type="text/jsx" src="navBar.js"></script>
     <script  type="text/jsx" src="meterList.js"></script>
     <script  type="text/jsx" src="leftPanel.js"></script>
@@ -65,7 +69,6 @@
        <button type="button" class="wheels"></button>
     </div>
 -->
-Hello world
 </div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
