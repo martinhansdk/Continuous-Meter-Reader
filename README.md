@@ -24,7 +24,7 @@ The communication protocol between the embedded code and the server is based on 
 
 ## Build instructions
 
-All build instructions assume Ubuntu 14.04 or later.
+All build instructions assume Ubuntu 15.04 or later.
 
 ### Install prerequisites
 
@@ -60,6 +60,32 @@ Attach the Arduino for the server receiver station and run
     go build ConfigNode.go 
     go build SampleSender.go 
 
+### Setup the Postgresql database
+
+Drop step 1 if you already have a database running
+
+1. change postgres default password:
+   su - postgres
+   psql
+   \password postgres
+   <enter new password>
+2. Create the 'meter' user:
+   CREATE USER meter;
+3. Set user password:
+   \password meter;
+   <use password: meter2>
+3. Create the database:
+   CREATE DATABASE meter;
+4. Grant priviledges to meter on database:
+   GRANT ALL PRIVILEGES ON DATABASE meter TO meter;
+5. Grant priviledges to meter on the database tables:
+   GRANT ALL PRIVILEGES ON TABLE meters TO meter;
+   GRANT ALL PRIVILEGES ON TABLE measurements TO meter;
+6. Insert the first meter into the meter table:
+   INSERT INTO meters(
+               id, name, unit, current_series, last_count)
+       VALUES (0,  "Water 0", "L", "0", "0");
+   
 ### Configuring the Arduino for a meter
 
 Each node has an id which is an integer between 1 and 127. We need to set this id and also choose the wireless or serial (USB) protocol. Configuration can only happen over USB.
@@ -78,6 +104,24 @@ The calibration procedure is as follows:
 3. Turn on a tap so that a constant flow is running. Make sure this is the only place water is consumed in the house while the calibration is running
 4. Run the command `go/ConfigNode -serial=/dev/ttyUSB0 -calibrate`
 5. The command will exit when calibration is complete
+
+### Running the Server
+
+Once the database is set up, and the MeterServer built, it can be run:
+
+   cd go
+   ./MeterServer
+
+Contact the server using http://localhost:2111/static
+
+## Running the mock meter (offline mode)
+
+Running tests with out having to flush a lot of water makes sense, so use the
+
+   cd go
+   ./SampleSender
+
+for this purpose.
 
 If everything is ok, the example output should look something like this:
 

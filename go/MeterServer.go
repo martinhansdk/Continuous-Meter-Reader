@@ -90,7 +90,7 @@ func main() {
 	})
 	go func() {
 		for msg := range tch {
-			log.Println(msg)
+			log.Println("JSON to UI:", msg)
 			server.BroadcastTo("updates", "meter update", msg)
 		}
 	}()

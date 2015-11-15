@@ -11,7 +11,16 @@ import (
 
 const host string = "localhost:2110"
 
-var meterId uint32 = 1
+// Setup
+var NUM_METERS              int = 4
+var UPDATE_INTERVAL_SECONDS int = 5
+var NUM_GARBAGE_BYTES       int = 49
+
+//----------------------------------------------------------------------
+func meterId() *uint32 {
+  var x uint32 = uint32(1+rand.Intn(NUM_METERS))
+  return &x
+}
 
 func send_garbage(sock io.Writer, amount int) {
 	var garbage []byte
@@ -34,8 +43,7 @@ func main() {
 	var count uint64
 	for {
 		update := new(MeterReader.CounterUpdate)
-
-		update.MeterId = &meterId
+		update.MeterId = meterId()
 		if rand.Intn(10) == 1 {
 			// new series
 			series += 1
@@ -49,9 +57,9 @@ func main() {
 
 		MeterReader.SendUpdate(s, update)
 		if rand.Intn(10) < 3 {
-			send_garbage(s, rand.Intn(49)+1)
+			send_garbage(s, rand.Intn(NUM_GARBAGE_BYTES)+1)
 		}
 
-		time.Sleep(1 * time.Second)
+		time.Sleep(time.Duration(rand.Intn(UPDATE_INTERVAL_SECONDS)) * time.Second)
 	}
 }
