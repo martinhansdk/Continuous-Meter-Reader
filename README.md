@@ -81,10 +81,11 @@ Drop step 1 if you already have a database running
 5. Grant priviledges to meter on the database tables:
    GRANT ALL PRIVILEGES ON TABLE meters TO meter;
    GRANT ALL PRIVILEGES ON TABLE measurements TO meter;
-6. Insert the first meter into the meter table:
+6. Create the database fields by executing the commands in database.sql
+7. Insert the first meter into the meter table:
    INSERT INTO meters(
-               id, name, unit, current_series, last_count)
-       VALUES (0,  "Water 0", "L", "0", "0");
+               id, name, unit, current_series, last_count, scale)
+       VALUES (1,  "Water 0", "L", "0", "0", 1e-3);
    
 ### Configuring the Arduino for a meter
 
