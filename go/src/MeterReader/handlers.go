@@ -11,10 +11,11 @@ import (
 /*
 CREATE TABLE meters
 	("id" integer CONSTRAINT pkey PRIMARY KEY,
-	 "name" varchar(40) NOt NULL,
+	 "name" varchar(40) NOT NULL,
 	 "unit" varchar(20) NOT NULL,
 	 "current_series" integer NOT NULL,
-	 "last_count" integer NOT NULL
+	 "last_count" integer NOT NULL,
+	 "scale" real NOT NULL
 	 );
 
 CREATE TABLE measurements
@@ -115,20 +116,25 @@ func (mdb *MeterDB) GetCurrentAbsoluteValues(w rest.ResponseWriter, req *rest.Re
 				meter,
 				name, 
 				unit, 
-				value
+				value*scale as value
 			FROM meters, measurements 
 			WHERE meters.id = measurements.meter
 			ORDER BY meter, measured_at DESC
 		`)
 }
 
-func (mdb *MeterDB) GetCumulativeValues(w rest.ResponseWriter, req *rest.Request) {
+func (mdb *MeterDB) GetValues(w rest.ResponseWriter, req *rest.Request) {
 	mdb.GetJSONFromDB(w, `
 		SELECT 
-			extract(epoch FROM measured_at) AS time, 
-			value - FIRST_VALUE(value) OVER (ORDER BY measured_at) AS rel_value 
-		FROM measurements
-		WHERE meter=?`, req.PathParam("meter"))
+		       json_agg(row)
+		FROM (
+		       SELECT 
+  		             extract('epoch' FROM measured_at) AS x, 
+			     value*scale AS y 
+                       FROM measurements, meters
+                       WHERE measurements.meter=$1 AND meters.id=measurements.meter 
+                ) AS row		
+		`, req.PathParam("meter"))
 }
 
 func (mdb *MeterDB) GetDifferentialValues(w rest.ResponseWriter, req *rest.Request) {
@@ -137,7 +143,7 @@ func (mdb *MeterDB) GetDifferentialValues(w rest.ResponseWriter, req *rest.Reque
 			extract(epoch FROM measured_at) AS time, 
 			value - LAG(value) OVER (ORDER BY measured_at) as diff_value 
 		FROM measurements
-		WHERE meter=?`, req.PathParam("meter"))
+		WHERE meter=$1`, req.PathParam("meter"))
 }
 
 func (mdb *MeterDB) GetDummyValues(w rest.ResponseWriter, req *rest.Request) {
