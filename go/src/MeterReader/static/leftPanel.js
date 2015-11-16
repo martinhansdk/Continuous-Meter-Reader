@@ -10,7 +10,7 @@ var LeftPanel = React.createClass({
         <div className="panel-heading">
           <h3 className="panel-title">Panel title</h3>
         </div>
-        <MeterList meterList={this.props.meterList} />
+        <MeterList meterList={this.props.meterList} onUpdate={this.props.onUpdate}/>
       </div>
     </div>
   </div>

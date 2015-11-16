@@ -1,4 +1,6 @@
 // Code for the right hand side panel
+var Panel = ReactBootstrap.Panel;
+
 var RightPanelBody = React.createClass({
     render: function() {
 	return (
@@ -16,16 +18,55 @@ var RightPanelBody = React.createClass({
 });
 
 var RightPanel = React.createClass({
+    // Set initial state
+    getInitialState: function() {
+	return {
+	    data: ''
+	};
+    },
+
+    componentWillReceiveProps: function() {
+	var data;
+	var that=this;
+	var jqxhr = $.getJSON( "/api/values/"+this.props.meterID )
+	.done(function(data) {
+            console.log(data);
+	    that.setState({ data:data });
+        })
+	.fail(function() {
+	    alert( "error: Failed to get graph data from server");
+	    that.setState({ data:'' });
+	});
+/*
+	.always(function() {
+	    alert( "complete");
+	});
+*/
+    },
+
     render: function() {
+        const title = (
+	    <h3>Graphs</h3>
+	);
+
+	return (
+          <div id="rightpane" className="col-md-8">
+	    <Panel bsStyle="primary" header={title}>
+		{JSON.stringify(this.state.data, null, 2) }
+	    </Panel>
+          </div>
+	);
+/*
 	return (
   <div id="rightpane" className="col-md-8">
       <div className="panel panel-primary">
         <div className="panel-heading">
-          <h3 className="panel-title">Panel title</h3>
+          <h3 className="panel-title">Panel title {this.props.meterID}</h3>
         </div>
         <RightPanelBody />
       </div>
   </div>
 	);
+*/
     }
 });
