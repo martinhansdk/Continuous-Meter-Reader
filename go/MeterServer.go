@@ -9,13 +9,10 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 	"time"
 )
-
-var serialPorts = [...]string{"/dev/ttyUSB0", "/dev/ttyUSB1", "/dev/ttyUSB2", "/dev/ttyUSB3",
-	"/dev/ttyUSB4", "/dev/ttyUSB5", "/dev/ttyUSB6", "/dev/ttyUSB7",
-	"/dev/ttyUSB8", "/dev/ttyUSB9", "/dev/ttyUSB10", "/dev/ttyUSB11"}
 
 func main() {
 	log.Println("Started Meter Receiver Server")
@@ -52,15 +49,19 @@ func main() {
 
 		for {
 
-			for i := range serialPorts {
-				config := &serial.Config{Name: serialPorts[i], Baud: 57600}
-				ser, err := serial.OpenPort(config)
+			serialPorts, err := filepath.Glob("/dev/ttyUSB")
 
-				if err != nil {
-					// ok, try the next port
-				} else {
-					log.Printf("Opened port %s", serialPorts[i])
-					MeterReader.HandleProtoClient(ser, updatechan, settingschan)
+			if err != nil {
+				for i := range serialPorts {
+					config := &serial.Config{Name: serialPorts[i], Baud: 57600}
+					ser, err := serial.OpenPort(config)
+
+					if err != nil {
+						// ok, try the next port
+					} else {
+						log.Printf("Opened port %s", serialPorts[i])
+						MeterReader.HandleProtoClient(ser, updatechan, settingschan)
+					}
 				}
 			}
 
