@@ -7,7 +7,6 @@
 
 RF24 radio(9, 10);
 RadioMessageReceiver<4, MeterReader_Message_size> receiver(radio);
-//const uint64_t radioAddress = 286093099LL;
 
 const char* addresses[] = {"meterS", "meterR"};
 
@@ -30,17 +29,6 @@ void setup() {
 }
 
 void loop() {
-  /*
-  unsigned long got_time;
-  if( radio.available()){
-                                                                  // Variable for the received timestamp
-    while (radio.available()) {                                   // While there is data ready
-      Serial.println("Got some!");
-      radio.read( &got_time, sizeof(unsigned long) );             // Get the payload
-    }
-  }
-  return;
-  */
   if(receiver.available()) {
     uint8_t *data;
 
