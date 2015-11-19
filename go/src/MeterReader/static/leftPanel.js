@@ -2,7 +2,7 @@
 
 var LeftPanel = React.createClass({
     render: function() {
-	console.log("LeftPanel :", this.props.meterList);
+	console.log("LeftPanel-render: ", this.props.meterList);
 	return (
   <div id="leftside" className="col-md-2">
     <div id="leftpane">

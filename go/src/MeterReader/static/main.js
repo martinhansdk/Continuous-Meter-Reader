@@ -41,11 +41,11 @@ var Main = React.createClass({
 	var that = this;
 	this.socket = io();
 	this.socket.on('meter update', function (data) {
-            console.log("JSON recv:", data);
-//            that.addMeterUpdate(data);
+            console.log("Main-componentDidMount-JSON recv:", data);
+            that.addMeterUpdate(data);
 	});
     },
-/*
+
     addMeterUpdate: function(update) {
 	var data = this.props.meterList;
 	var len  = data.length;
@@ -60,18 +60,18 @@ var Main = React.createClass({
 	}
 	this.setState(data);
     },
-*/
+
     /* Handler for selection of Meters in the left panel */
     /* This is passed React style through the hierarchy to the individual buttons
        so that the state can live in the top component.
     */
     meterSelectionHandler: function(meter) {
-	console.log("Meter selected is: ", meter);
+	console.log("main-meterSelectionHandler: ", meter);
 	this.setState({ selectedMeter : meter});
     },
 
     render: function() {
-        console.log("Main");
+        console.log("Main-render");
 	return (
 	    <div>
 		<LeftPanel meterList={this.props.meterList} onUpdate={this.meterSelectionHandler}/>
