@@ -110,7 +110,7 @@ func (mdb *MeterDB) GetValues(w rest.ResponseWriter, req *rest.Request) {
 		       json_agg(row)
 		FROM (
 		       SELECT 
-  		             extract('epoch' FROM measured_at) AS x, 
+  		             extract('epoch' FROM measured_at)*1000 AS x, 
 			     value*scale AS y 
                        FROM measurements, meters
                        WHERE measurements.meter=$1 AND meters.id=measurements.meter 
