@@ -49,9 +49,9 @@ func main() {
 
 		for {
 
-			serialPorts, err := filepath.Glob("/dev/ttyUSB")
+			serialPorts, err := filepath.Glob("/dev/ttyUSB*")
 
-			if err != nil {
+			if err == nil {
 				for i := range serialPorts {
 					config := &serial.Config{Name: serialPorts[i], Baud: 57600}
 					ser, err := serial.OpenPort(config)
