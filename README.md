@@ -39,12 +39,25 @@ The project uses git submodules, so you have to use a recursive clone to get eve
 
     git clone --recursive https://github.com/martinhansdk/Continuous-Meter-Reader
 
-### Uploading the embedded code to the Arduinos
+### Uploading the embedded code to the MCU on the meter reader node
 
-Attach the Arduino for the utility meter to a USB port and run
+Using an AVR ISP programmer (for instance an Arduino with the
+ArduinoISP sketch loaded), attach it to the ISP header on the meter
+reader board. In the Arduino IDE select the appropriate programmer
+type.  Choose the board type to be "Arduino Pro or Pro Mini (3.3V, 8
+MHz) w/ ATmega328". Then run "Tools > Burn bootloader".
+
+Once this has completed correctly, the brown out detection must be cleared in the AVR in order to allow operating the AVR at 2.5V. Do this by running:
+
+    avrdude -patmega328p -cstk500v1 -P /dev/ttyUSB? -b19200 -U efuse:w:0xff:m
+
+Now disconnect the ISP and connect a 3.3V FTDI USB to serial adapter to
+JP2. The run
 
     cd src/Continuous-Meter-Reader
     make upload
+
+### Uploading the embedded code to the Arduino on the receiver station
     
 Attach the Arduino for the server receiver station and run
 
