@@ -40,6 +40,7 @@ func main() {
 	var id = flag.Uint("id", math.MaxUint32, "Set the meter id")
 	var seriesId = flag.Uint("series", 0, "Set the series id")
 	var calibrate = flag.Bool("calibrate", false, "Start calibration")
+	var uncalibrate = flag.Bool("uncalibrate", false, "Reset calibration values")
 	var serialProtocol = flag.Bool("serialproto", false, "Use serial communication to transfer updates")
 	var wirelessProtocol = flag.Bool("wirelessproto", false, "Use wireless to transfer updates")
 	var risingEdgeAmounts edgeAmounts
@@ -111,6 +112,12 @@ func main() {
 		settings.FallingEdgeAmounts = fallingEdgeAmounts.amounts
 		settings.RisingEdgeAmounts = risingEdgeAmounts.amounts
 
+		changedSettings = true
+	}
+
+	if *uncalibrate {
+		settings.FallingEdgeAmounts = []uint32{0, 0, 0, 0, 0, 0}
+		settings.RisingEdgeAmounts = []uint32{0, 0, 0, 0, 0, 0}
 		changedSettings = true
 	}
 
