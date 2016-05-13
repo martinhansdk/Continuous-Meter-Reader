@@ -8,12 +8,17 @@ import (
 	"net/http"
 )
 
-type MeterDB struct {
+type MeasurementStorer interface {
+	InsertMeasurement(msg *MeterUpdate)
+	UpdateMeterState(meter *Meter)
+}
+
+type PostgresMeterDB struct {
 	db *sql.DB
 }
 
-func NewMeterDB() *MeterDB {
-	mdb := new(MeterDB)
+func NewMeterDB() *PostgresMeterDB {
+	mdb := new(PostgresMeterDB)
 
 	db, err := sql.Open("postgres", "user=meter dbname=meter password=meter2")
 	if err != nil {
@@ -24,7 +29,7 @@ func NewMeterDB() *MeterDB {
 	return mdb
 }
 
-func (mdb *MeterDB) GetMeterState() map[uint32]*Meter {
+func (mdb *PostgresMeterDB) GetMeterState() map[uint32]*Meter {
 	meters := make(map[uint32]*Meter)
 
 	var (
@@ -32,7 +37,7 @@ func (mdb *MeterDB) GetMeterState() map[uint32]*Meter {
 		name           string
 		unit           string
 		current_series uint32
-		last_count     uint64
+		start_count    uint64
 		last_value     uint64
 	)
 
@@ -42,7 +47,7 @@ func (mdb *MeterDB) GetMeterState() map[uint32]*Meter {
 				name, 
 				unit, 
 				current_series, 
-				last_count, 
+				last_count AS start_count, 
 				value AS last_value 
 			FROM meters, measurements 
 			WHERE meters.id = measurements.meter
@@ -52,12 +57,12 @@ func (mdb *MeterDB) GetMeterState() map[uint32]*Meter {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		err := rows.Scan(&id, &name, &unit, &current_series, &last_count, &last_value)
+		err := rows.Scan(&id, &name, &unit, &current_series, &start_count, &last_value)
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.Println(id, name, unit, current_series, last_count, last_value)
-		meter := &Meter{MeterId: id, Name: name, Unit: unit, CurrentSeries: current_series, StartCount: last_count, LastCount: last_value}
+		log.Printf("meter=%d %s/%s, series=%d, start_count=%d, last_value=%d", id, name, unit, current_series, start_count, last_value)
+		meter := &Meter{MeterId: id, Name: name, Unit: unit, CurrentSeries: current_series, StartCount: start_count, LastCount: last_value}
 		meters[id] = meter
 	}
 	err = rows.Err()
@@ -69,7 +74,18 @@ func (mdb *MeterDB) GetMeterState() map[uint32]*Meter {
 	return meters
 }
 
-func (mdb *MeterDB) InsertMeasurement(msg *MeterUpdate) {
+func (mdb *PostgresMeterDB) UpdateMeterState(meter *Meter) {
+	_, err := mdb.db.Exec(`
+			UPDATE meters 
+			SET current_series=($1), last_count=($2)
+			WHERE id=($3);`, meter.CurrentSeries, meter.StartCount, meter.MeterId)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (mdb *PostgresMeterDB) InsertMeasurement(msg *MeterUpdate) {
 	_, err := mdb.db.Exec(`
 			INSERT INTO measurements(meter, measured_at, value)
 			VALUES(($1), ($2), ($3));`, msg.MeterId, msg.MeasuredAt, msg.Value)
@@ -80,7 +96,7 @@ func (mdb *MeterDB) InsertMeasurement(msg *MeterUpdate) {
 
 }
 
-func (mdb *MeterDB) GetJSONFromDB(w rest.ResponseWriter, query string, args ...interface{}) {
+func (mdb *PostgresMeterDB) GetJSONFromDB(w rest.ResponseWriter, query string, args ...interface{}) {
 	var json string
 	err := mdb.db.QueryRow("SELECT json_agg(t) FROM ("+query+") as t;", args...).Scan(&json)
 
@@ -91,7 +107,7 @@ func (mdb *MeterDB) GetJSONFromDB(w rest.ResponseWriter, query string, args ...i
 	w.(http.ResponseWriter).Write([]byte(json))
 }
 
-func (mdb *MeterDB) GetCurrentAbsoluteValues(w rest.ResponseWriter, req *rest.Request) {
+func (mdb *PostgresMeterDB) GetCurrentAbsoluteValues(w rest.ResponseWriter, req *rest.Request) {
 	mdb.GetJSONFromDB(w, `
 		SELECT DISTINCT ON(meter)
 				meter,
@@ -104,7 +120,7 @@ func (mdb *MeterDB) GetCurrentAbsoluteValues(w rest.ResponseWriter, req *rest.Re
 		`)
 }
 
-func (mdb *MeterDB) GetValues(w rest.ResponseWriter, req *rest.Request) {
+func (mdb *PostgresMeterDB) GetValues(w rest.ResponseWriter, req *rest.Request) {
 	mdb.GetJSONFromDB(w, `
 		SELECT 
 		       json_agg(row)
@@ -118,20 +134,11 @@ func (mdb *MeterDB) GetValues(w rest.ResponseWriter, req *rest.Request) {
 		`, req.PathParam("meter"))
 }
 
-func (mdb *MeterDB) GetDifferentialValues(w rest.ResponseWriter, req *rest.Request) {
+func (mdb *PostgresMeterDB) GetDifferentialValues(w rest.ResponseWriter, req *rest.Request) {
 	mdb.GetJSONFromDB(w, `
 		SELECT 
 			extract(epoch FROM measured_at) AS time, 
 			value - LAG(value) OVER (ORDER BY measured_at) as diff_value 
 		FROM measurements
 		WHERE meter=$1`, req.PathParam("meter"))
-}
-
-func (mdb *MeterDB) GetDummyValues(w rest.ResponseWriter, req *rest.Request) {
-	json := `[{	
-		"color": "blue",
-		"name": "New York",
-		"data": [ { "x": 0, "y": 40 }, { "x": 1, "y": 49 }, { "x": 2, "y": 38 }, { "x": 3, "y": 30 }, { "x": 4, "y": 32 } ]	
-		}]`
-	w.(http.ResponseWriter).Write([]byte(json))
 }

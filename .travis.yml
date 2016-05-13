@@ -3,8 +3,12 @@ compiler:
   - gcc
 sudo: required
 dist: trusty
+go:
+  - 1.4
 git:
   submodules: false
+env:
+- GOPATH=$TRAVIS_BUILD_DIR/go
 before_install:
   - git submodule update --init --recursive
   - sudo apt-get update -qq
@@ -13,4 +17,6 @@ script:
  - cd $TRAVIS_BUILD_DIR/src/Continuous-Meter-Reader && make
  - cd $TRAVIS_BUILD_DIR/src/RadioStation && make
  - cd $TRAVIS_BUILD_DIR/test && make
+ - cd $TRAVIS_BUILD_DIR/go && go get -d
+ - cd $TRAVIS_BUILD_DIR/go && go test MeterReader/...
  #- ./script/travis_format_checcker.sh

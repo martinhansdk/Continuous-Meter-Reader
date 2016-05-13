@@ -23,14 +23,15 @@ type MeterUpdate struct {
 }
 
 type MeterStateHandler struct {
-	mdb    *MeterDB
+	mdb    MeasurementStorer
 	meters map[uint32]*Meter
 }
 
 func NewMeterStateHandler() *MeterStateHandler {
 	msh := new(MeterStateHandler)
-	msh.mdb = NewMeterDB()
-	msh.meters = msh.mdb.GetMeterState()
+	mdb := NewMeterDB()
+	msh.mdb = mdb
+	msh.meters = mdb.GetMeterState()
 
 	return msh
 }
@@ -41,7 +42,9 @@ func (msh *MeterStateHandler) Handle(queue chan *CounterUpdate) chan *MeterUpdat
 	go func() {
 		for msg := range queue {
 			tmsg := msh.Translate(msg)
-			outch <- tmsg
+			if tmsg != nil {
+				outch <- tmsg
+			}
 		}
 	}()
 
@@ -55,9 +58,8 @@ func (msh *MeterStateHandler) Translate(msg *CounterUpdate) *MeterUpdate {
 
 	meter, ok := msh.meters[MeterId]
 	if !ok {
-		meter = &Meter{MeterId: MeterId}
-		msh.meters[MeterId] = meter
-		log.Printf("Creating new meter instance id %s\n", MeterId)
+		log.Printf("Ignoring unknown new meter instance id %d\n", MeterId)
+		return nil
 	}
 
 	SeriesId := msg.GetSeriesId()
@@ -66,6 +68,8 @@ func (msh *MeterStateHandler) Translate(msg *CounterUpdate) *MeterUpdate {
 	if meter.CurrentSeries != SeriesId {
 		meter.CurrentSeries = SeriesId
 		meter.StartCount = meter.LastCount
+
+		msh.mdb.UpdateMeterState(meter)
 	}
 
 	newCount := meter.StartCount + CurrentCounterValue
@@ -88,7 +92,8 @@ func (msh *MeterStateHandler) Translate(msg *CounterUpdate) *MeterUpdate {
 
 	if changed {
 		msh.mdb.InsertMeasurement(&umsg)
+		return &umsg
 	}
 
-	return &umsg
+	return nil
 }
