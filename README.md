@@ -21,8 +21,7 @@ sense quantities around 1/12 of a liter. The reflective part of the
 disc is not exactly a half circle, so the exact 12 quantities measured
 are different from each other. An automatic calibration method is
 provided which determines how much each quantity is. You can print a
-[PDF rendering of the PCB layout](pcb/Optical water meter
-reader/optical meter reader board.pdf), make 5mm holes for the
+[PDF rendering of the PCB layout](pcb/Optical%20water%20meter%20reader/optical%20meter%20reader%20board.pdf), make 5mm holes for the
 steering pins plus a small hole for the middle of the sensor circle in
 your printout and see if it will fit on your meter. When attached to
 your meter the small hole should be right above the center of the
@@ -31,33 +30,31 @@ disc.
 <img alt="Photo of the PCB" src="pcb/Optical water meter reader/pcb lineup.png" width="50%">
 
 * The top row shows the version of the PCB designed to run on two 1.5V batteries and transmit the readings wirelessly.
-  * [Eagle schematics](pcb/Optical water meter reader/optical meter reader v3.sch) / [PDF schematics](pcb/Optical water meter reader/optical meter reader v3 battery assembly.pdf)
-  * [Eagle board file](pcb/Optical water meter reader/optical meter reader v3.brd)
-  * [Gerber files](pcb/Optical water meter reader/optical meter reader v3 - gerber.zip)
-  * [Bill of materials](pcb/Optical water meter reader/optical meter reader v3 battery assembly BOM.txt)
+  * [Eagle schematics](pcb/Optical%20water%20meter%20reader/optical%20meter%20reader%20v3.sch) / [PDF schematics](pcb/Optical%20water%20meter%20reader/optical%20meter%20reader%20v3%20battery%20assembly.pdf)
+  * [Eagle board file](pcb/Optical%20water%20meter%20reader/optical%20meter%20reader%20v3.brd)
+  * [Gerber files](pcb/Optical%20water%20meter%20reader/optical%20meter%20reader%20v3%20-%20gerber.zip)
+  * [Bill of materials](pcb/Optical%20water%20meter%20reader/optical%20meter%20reader%20v3%20battery%20assembly%20BOM.txt)
   * [Firmware](src/Continuous-Meter-Reader/Continuous-Meter-Reader.ino)
 * The bottom row shows the version of the PCB designed to be connected directly to a PC using a USB cable. In the configuration shown here it operates as the radio receiver that receives the readings transmitted from other units.
-  * [Eagle schematics](pcb/Optical water meter reader/optical meter reader.sch) / [PDF schematics](pcb/Optical water meter reader/optical meter reader.pdf)
-  * [Eagle board file](pcb/Optical water meter reader/optical meter reader.brd)
-  * [Gerber files](pcb/Optical water meter reader/optical meter reader gerber.zip)
+  * [Eagle schematics](pcb/Optical%20water%20meter%20reader/optical%20meter%20reader.sch) / [PDF schematics](pcb/Optical%20water%20meter%20reader/optical%20meter%20reader.pdf)
+  * [Eagle board file](pcb/Optical%20water%20meter%20reader/optical%20meter%20reader.brd)
+  * [Gerber files](pcb/Optical%20water%20meter%20reader/optical%20meter%20reader%20gerber.zip)
   * [Firmware](src/RadioStation/RadioStation.ino)
 
 The ambition is that the same or a similar PCB will be able to read
 the turning weel on an old style electricity meter. The PCB was
-designed in [Eagle pcb](http://www.cadsoftusa.com/) and the schematics
-are available [here](pcb/Optical water meter reader/optical meter
-reader.pdf).
+designed in [Eagle pcb](http://www.cadsoftusa.com/).
 
 The USB version uses an [Arduino
 Nano](https://www.arduino.cc/en/Main/ArduinoBoardNano) as the CPU
 module and [NRF24L01+ Wireless Transceiver
 Module](http://www.icstation.com/1pcs-nrf24l0124ghz-wireless-transceiver-module-arduino-p-1388.html)
 for wireless connectivity. The battery powered module has the
-microcontroller directly on the PCB.
+microcontroller directly on the PCB and uses the same wireless transceiver.
 
 The server application runs on a PC written in
 [Go](https://golang.org/) and stores the measurements in a
-[Postgres](http://www.postgresql.org) database. The server application
+[PostgreSQL](http://www.postgresql.org) database. The server application
 exposes a REST API, a [socket.io](http://socket.io/) service for real
 time updates and also serves a web application written in
 [React](http://facebook.github.io/react/).
@@ -122,7 +119,7 @@ Attach the Arduino for the server receiver station and run
     go build ConfigNode.go 
     go build SampleSender.go 
 
-### Setup the Postgresql database
+### Setup the PostgreSQL database
 
 Drop step 1 if you already have a database running
 
