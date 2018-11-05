@@ -27,7 +27,7 @@
     "jsdom": "~0.5.4",
     "nodeunit": "~0.7.4",
     "clean-css": "~0.10.2",
-    "uglify-js": "~2.2.5",
+    "uglify-js": "~> 2.6.0",
     "jshint": "~1.1.0"
   },
   "scripts": {
